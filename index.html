@@ -218,7 +218,7 @@
     </div>
     <div id="gestureOverlay"></div>
   </div>
-  <div id="gestureStatus">👌 Преход Дилера 3 пальца</div>
+  <div id="gestureStatus">👌 Покажите 3 пальца</div>
 </div>
 
 <div class="cheatsheet-overlay" id="cheatOverlay">
@@ -320,7 +320,7 @@ function initMediaPipe() {
       } else {
         gestureState.holding = Math.max(0, gestureState.holding - 300);
         $('gestureOverlay').classList.remove('detected');
-        $('gestureStatus').textContent = gestureState.holding > 200 ? '👌 Почти...' : '👌 Смена дилера 3 пальца';
+        $('gestureStatus').textContent = gestureState.holding > 200 ? '👌 Почти...' : '👌 Покажите 3 пальца';
       }
     } else {
       gestureState.holding = Math.max(0, gestureState.holding - 300);
