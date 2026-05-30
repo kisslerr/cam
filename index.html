@@ -72,13 +72,13 @@
   .table-surface { width: min(75vw, 60vh); height: min(50vw, 40vh); border-radius: 35% / 50%; background: #1e331e; border: 8px solid #2a4a2a; position: relative; box-shadow: 0 0 80px rgba(0,0,0,0.9), inset 0 0 40px rgba(0,0,0,0.8); }
   .felt-texture { position: absolute; top:0; left:0; width:100%; height:100%; border-radius: 35% / 50%; background-image: url("data:image/svg+xml,%3Csvg width='6' height='6' viewBox='0 0 6 6' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%23000000' fill-opacity='0.1' fill-rule='evenodd'%3E%3Cpath d='M5 0h1L0 6V5zM6 5v1H5z'/%3E%3C/g%3E%3C/svg%3E"); opacity: 0.3; pointer-events: none; }
   
-  .center-info { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); text-align: center; z-index: 5; pointer-events: none; color: #e8f5e9; text-shadow: 0 2px 8px rgba(0,0,0,0.8); width: 100%; }
-  .center-info .level { font-size: 1.2rem; opacity: 0.7; margin-bottom: 5px; }
-  .center-info .blinds { font-size: 9rem; font-weight: 800; margin: 10px 0; line-height: 1.1; }
-  .center-info .timer { font-size: 6rem; font-variant-numeric: tabular-nums; letter-spacing: 2px; font-weight: 700; }
+  .center-info { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); text-align: center; z-index: 5; pointer-events: none; color: #e8f5e9; text-shadow: 0 2px 8px rgba(0,0,0,0.8); width: 90%; max-width: 280px; }
+  .center-info .level { font-size: 1.1rem; opacity: 0.7; margin-bottom: 4px; }
+  .center-info .blinds { font-size: 7rem; font-weight: 800; margin: 8px 0; line-height: 1.1; white-space: nowrap; }
+  .center-info .timer { font-size: 5rem; font-variant-numeric: tabular-nums; letter-spacing: 2px; font-weight: 700; margin: 6px 0; }
   .center-info .timer.warning { color: var(--warn); }
   .center-info .timer.danger { color: var(--danger); animation: pulse 0.8s infinite; }
-  .center-info .next-blinds { font-size: 1.5rem; opacity: 0.7; margin-top: 10px; font-weight: 500; letter-spacing: 1px; white-space: nowrap; }
+  .center-info .next-blinds { font-size: 1.2rem; opacity: 0.7; margin-top: 8px; font-weight: 500; letter-spacing: 1px; white-space: nowrap; }
   .center-info .next-blinds span { color: var(--accent); font-weight: 700; font-size: 1.1em; }
 
   .player-node { position: absolute; width: 75px; height: 75px; border-radius: 50%; background: #2a3d2a; border: 2px solid #555; display: flex; flex-direction: column; justify-content: center; align-items: center; transform: translate(-50%, -50%); transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1); box-shadow: 0 4px 12px rgba(0,0,0,0.8); color: white; font-size: 0.8rem; text-align: center; cursor: pointer; z-index: 6; user-select: none; padding: 3px; }
@@ -101,34 +101,18 @@
   .flying-chip { position: absolute; width: 28px; height: 28px; border-radius: 50%; background: radial-gradient(circle at 30% 30%, #fff, #ffd700, #b8860b); border: 2px dashed #b8860b; box-shadow: 0 4px 10px rgba(0,0,0,0.6); z-index: 20; pointer-events: none; display: flex; align-items: center; justify-content: center; }
   .flying-chip::after { content: '$'; color: #5c4003; font-weight: bold; font-size: 12px; }
 
-  /* ДИЛЕР СПРАВА НА МОБИЛЬНЫХ */
-  #mobDealerBtn { display: none; position: fixed; bottom: 15px; right: 15px; z-index: 101; width: 44px; height: 44px; border-radius: 50%; background: rgba(33,150,243,0.9); border: none; color: #fff; cursor: pointer; font-size: 1.1rem; box-shadow: 0 4px 15px rgba(0,0,0,0.5); transition: 0.2s; align-items: center; justify-content: center; }
+  /* МОБИЛЬНЫЕ КНОПКИ */
+  #mobDealerBtn { display: none; position: fixed; bottom: 15px; right: 15px; z-index: 101; width: 48px; height: 48px; border-radius: 50%; background: rgba(33,150,243,0.9); border: none; color: #fff; cursor: pointer; font-size: 1.2rem; box-shadow: 0 4px 15px rgba(0,0,0,0.5); transition: 0.2s; align-items: center; justify-content: center; backdrop-filter: blur(4px); }
   #mobDealerBtn:active { transform: scale(0.9); }
 
-  /* ЖЕСТ СЛЕВА ВНИЗУ */
-  #ambCamBtn { display: none; position: fixed; bottom: 15px; left: 15px; z-index: 101; width: 44px; height: 44px; border-radius: 50%; background: rgba(46, 125, 50, 0.9); border: none; color: #fff; cursor: pointer; font-size: 1.1rem; box-shadow: 0 4px 15px rgba(0,0,0,0.5); transition: 0.2s; align-items: center; justify-content: center; }
+  #ambCamBtn { display: none; position: fixed; bottom: 15px; left: 15px; z-index: 101; width: 48px; height: 48px; border-radius: 50%; background: rgba(46, 125, 50, 0.9); border: none; color: #fff; cursor: pointer; font-size: 1.2rem; box-shadow: 0 4px 15px rgba(0,0,0,0.5); transition: 0.2s; align-items: center; justify-content: center; backdrop-filter: blur(4px); }
   #ambCamBtn.active { background: #c62828; }
   #ambCamBtn:active { transform: scale(0.9); }
 
-  #ambCheatBtn { display: none; position: fixed; bottom: 70px; right: 15px; z-index: 101; padding: 8px 12px; background: rgba(93, 64, 55, 0.9); border: none; color: #fff; border-radius: 20px; cursor: pointer; font-size: 0.85rem; box-shadow: 0 4px 15px rgba(0,0,0,0.5); transition: 0.2s; backdrop-filter: blur(4px); font-weight: bold; }
+  #ambCheatBtn { display: none; position: fixed; bottom: 75px; right: 15px; z-index: 101; padding: 8px 12px; background: rgba(93, 64, 55, 0.9); border: none; color: #fff; border-radius: 20px; cursor: pointer; font-size: 0.85rem; box-shadow: 0 4px 15px rgba(0,0,0,0.5); transition: 0.2s; backdrop-filter: blur(4px); font-weight: bold; }
 
   /* ВЫХОД В ЛЕВОМ ВЕРХНЕМ УГЛУ */
-  .ambient-hint { 
-    position: fixed; 
-    top: 15px; 
-    left: 15px; 
-    text-align: center; 
-    color: #fff; 
-    font-size: 0.8rem; 
-    z-index: 101; 
-    cursor: pointer; 
-    padding: 6px 10px; 
-    background: rgba(0,0,0,0.5); 
-    border-radius: 16px; 
-    backdrop-filter: blur(4px); 
-    border: 1px solid rgba(255,255,255,0.15); 
-    transition: 0.2s; 
-  }
+  .ambient-hint { position: fixed; top: 15px; left: 15px; text-align: center; color: #fff; font-size: 0.8rem; z-index: 101; cursor: pointer; padding: 6px 10px; background: rgba(0,0,0,0.5); border-radius: 16px; backdrop-filter: blur(4px); border: 1px solid rgba(255,255,255,0.15); transition: 0.2s; }
   .ambient-hint:hover { background: rgba(0,0,0,0.7); }
 
   #gestureOverlay { display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 150px; height: 150px; border-radius: 50%; border: 3px dashed rgba(255,255,255,0.3); z-index: 105; pointer-events: none; animation: pulse-border 2s infinite; }
@@ -151,30 +135,31 @@
 
   @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
-  @media (min-width: 541px) {
-    #mobDealerBtn, #ambCamBtn, #ambCheatBtn { display: none !important; }
+  /* АДАПТАЦИЯ ДЛЯ МОБИЛЬНЫХ */
+  @media (max-width: 540px) {
+    .center-info { max-width: 220px; }
+    .center-info .blinds { font-size: 4.5rem; }
+    .center-info .timer { font-size: 3.8rem; }
+    .center-info .next-blinds { font-size: 1rem; }
+    
+    .player-node { width: 60px; height: 60px; }
+    .p-name { font-size: 0.65rem; max-width: 48px; }
+    .p-badge { font-size: 0.5rem; }
+    
+    .table-surface { width: min(85vw, 50vh); height: min(52vw, 30vh); }
+    
+    #gestureOverlay { width: 120px; height: 120px; }
+    #gestureStatus { bottom: 65px; font-size: 0.8rem; }
   }
 
-  @media (max-width: 540px) {
-    .blinds { font-size: 2.8rem; } .timer { font-size: 4rem; }
-    .center-info .blinds { font-size: 7rem; }
-    .center-info .timer { font-size: 4.5rem; }
-    .center-info .next-blinds { font-size: 1.1rem; }
-    .player-node { width: 60px; height: 60px; }
-    .p-name { font-size: 0.65rem; max-width: 50px; }
-    .p-badge { font-size: 0.5rem; }
-    .table-surface { width: min(82vw, 52vh); height: min(52vw, 33vh); }
-    .ambient-hint { top: 10px; left: 10px; font-size: 0.75rem; padding: 5px 8px; }
-    #gestureOverlay { width: 120px; height: 120px; }
-    #gestureStatus { bottom: 65px; font-size: 0.8rem; padding: 5px 12px; }
+  @media (min-width: 541px) {
+    #mobDealerBtn, #ambCamBtn, #ambCheatBtn { display: none !important; }
   }
 </style>
 </head>
 <body>
 
 <div class="ambient-hint" id="ambientHint">✕ Выход</div>
-
-<!-- Кнопки управления на мобильных -->
 <button id="mobDealerBtn" onclick="changeDealer(true)" title="Сменить дилера">🔄</button>
 <button id="ambCheatBtn" onclick="$('cheatOverlay').classList.add('active')">📋</button>
 <button id="ambCamBtn">📷</button>
@@ -430,10 +415,10 @@ function renderAmbientTable() {
   if (players.length < 1) return; 
   const pos = getPositions(); const count = players.length; 
   
-  // Компактные радиусы: игроки вплотную к столу, не растягиваются
+  // Адаптивные радиусы: на мобильных игроки дальше от центра, чтобы не лезть на таймер
   const isMobile = window.innerWidth <= 540;
-  const radiusX = isMobile ? 32 : 40;
-  const radiusY = isMobile ? 25 : 30; 
+  const radiusX = isMobile ? 42 : 40;
+  const radiusY = isMobile ? 34 : 30; 
 
   players.forEach((p, i) => { 
     const angleDeg = (360 / count) * i - 90; 
@@ -462,7 +447,6 @@ function renderAmbientTable() {
     node.style.left = `${x}%`; node.style.top = `${y}%`; table.appendChild(node); 
   }); 
   
-  // Показываем мобильные кнопки только в Ambient режиме
   $('mobDealerBtn').style.display = isMobile ? 'flex' : 'none';
   $('ambCamBtn').style.display = isMobile ? 'flex' : 'none';
   $('ambCheatBtn').style.display = isMobile ? 'block' : 'none';
