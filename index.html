@@ -67,17 +67,14 @@
 
   #ambientTable { display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: radial-gradient(circle at center, #0f1a0f 0%, #050805 100%); z-index: 100; align-items: center; justify-content: center; touch-action: none; }
   body.ambient #ambientTable { display: flex; }
-  body.ambient > *:not(#ambientTable):not(#ambDealerBtn):not(#ambCheatBtn):not(#ambCamBtn):not(.ambient-hint):not(.cheatsheet-overlay):not(#gestureOverlay):not(#gestureStatus) { display: none !important; }
+  body.ambient > *:not(#ambientTable):not(#ambCheatBtn):not(#ambCamBtn):not(.ambient-hint):not(.cheatsheet-overlay):not(#gestureOverlay):not(#gestureStatus):not(#mobileControlBar) { display: none !important; }
 
   .table-surface { width: min(75vw, 60vh); height: min(50vw, 40vh); border-radius: 35% / 50%; background: #1e331e; border: 8px solid #2a4a2a; position: relative; box-shadow: 0 0 80px rgba(0,0,0,0.9), inset 0 0 40px rgba(0,0,0,0.8); }
   .felt-texture { position: absolute; top:0; left:0; width:100%; height:100%; border-radius: 35% / 50%; background-image: url("data:image/svg+xml,%3Csvg width='6' height='6' viewBox='0 0 6 6' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%23000000' fill-opacity='0.1' fill-rule='evenodd'%3E%3Cpath d='M5 0h1L0 6V5zM6 5v1H5z'/%3E%3C/g%3E%3C/svg%3E"); opacity: 0.3; pointer-events: none; }
   
   .center-info { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); text-align: center; z-index: 5; pointer-events: none; color: #e8f5e9; text-shadow: 0 2px 8px rgba(0,0,0,0.8); width: 100%; }
   .center-info .level { font-size: 1.2rem; opacity: 0.7; margin-bottom: 5px; }
-  
-  /* УВЕЛИЧЕННЫЕ БЛАЙНДЫ */
   .center-info .blinds { font-size: 9rem; font-weight: 800; margin: 10px 0; line-height: 1.1; }
-  
   .center-info .timer { font-size: 6rem; font-variant-numeric: tabular-nums; letter-spacing: 2px; font-weight: 700; }
   .center-info .timer.warning { color: var(--warn); }
   .center-info .timer.danger { color: var(--danger); animation: pulse 0.8s infinite; }
@@ -104,17 +101,13 @@
   .flying-chip { position: absolute; width: 30px; height: 30px; border-radius: 50%; background: radial-gradient(circle at 30% 30%, #fff, #ffd700, #b8860b); border: 2px dashed #b8860b; box-shadow: 0 4px 10px rgba(0,0,0,0.6); z-index: 20; pointer-events: none; display: flex; align-items: center; justify-content: center; }
   .flying-chip::after { content: '$'; color: #5c4003; font-weight: bold; font-size: 14px; }
 
-  #ambDealerBtn { position: fixed; bottom: 30px; right: 30px; z-index: 101; padding: 12px 20px; background: rgba(33,150,243,0.9); border: none; color: #fff; border-radius: 30px; cursor: pointer; font-size: 1rem; box-shadow: 0 4px 15px rgba(0,0,0,0.5); transition: 0.2s; backdrop-filter: blur(4px); font-weight: bold; }
-  #ambDealerBtn:hover { transform: scale(1.05); background: #1976d2; }
-  
-  #ambCheatBtn { position: fixed; bottom: 30px; left: 30px; z-index: 101; padding: 12px 20px; background: rgba(93, 64, 55, 0.9); border: none; color: #fff; border-radius: 30px; cursor: pointer; font-size: 1rem; box-shadow: 0 4px 15px rgba(0,0,0,0.5); transition: 0.2s; backdrop-filter: blur(4px); font-weight: bold; }
-  #ambCheatBtn:hover { transform: scale(1.05); background: #4e342e; }
+  #ambCheatBtn { position: fixed; bottom: 10px; right: 10px; z-index: 101; padding: 8px 12px; background: rgba(93, 64, 55, 0.9); border: none; color: #fff; border-radius: 20px; cursor: pointer; font-size: 0.85rem; box-shadow: 0 4px 15px rgba(0,0,0,0.5); transition: 0.2s; backdrop-filter: blur(4px); font-weight: bold; display: none; }
 
-  #ambCamBtn { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%); z-index: 101; padding: 10px 18px; background: #2e7d32; border: none; color: #fff; border-radius: 30px; cursor: pointer; font-size: 0.95rem; box-shadow: 0 4px 15px rgba(0,0,0,0.5); transition: 0.2s; backdrop-filter: blur(4px); font-weight: bold; display: none; }
+  #ambCamBtn { position: fixed; bottom: 15px; left: 50%; transform: translateX(-50%); z-index: 101; padding: 10px 18px; background: #2e7d32; border: none; color: #fff; border-radius: 30px; cursor: pointer; font-size: 0.95rem; box-shadow: 0 4px 15px rgba(0,0,0,0.5); transition: 0.2s; backdrop-filter: blur(4px); font-weight: bold; display: none; }
   #ambCamBtn:hover { transform: translateX(-50%) scale(1.05); background: #1b5e20; }
   #ambCamBtn.active { background: #c62828; }
 
-  /* ВЫХОД В ЛЕВОМ УГЛУ */
+  /* ВЫХОД В ЛЕВОМ ВЕРХНЕМ УГЛУ */
   .ambient-hint { 
     position: fixed; 
     top: 20px; 
@@ -132,6 +125,31 @@
     transition: 0.2s; 
   }
   .ambient-hint:hover { background: rgba(0,0,0,0.6); }
+
+  /* МОБИЛЬНАЯ ПАНЕЛЬ УПРАВЛЕНИЯ */
+  #mobileControlBar { 
+    display: none; 
+    position: fixed; 
+    bottom: 60px; 
+    left: 0; right: 0; 
+    z-index: 101; 
+    display: flex; 
+    justify-content: center; 
+    gap: 15px; 
+    pointer-events: none;
+  }
+  .mob-btn { 
+    pointer-events: auto; 
+    padding: 10px 20px; 
+    border-radius: 20px; 
+    background: rgba(0,0,0,0.5); 
+    backdrop-filter: blur(4px); 
+    border: 1px solid rgba(255,255,255,0.2); 
+    color: white; 
+    font-size: 0.9rem; 
+    cursor: pointer;
+  }
+  .mob-btn:active { transform: scale(0.95); }
 
   #gestureOverlay { display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 180px; height: 180px; border-radius: 50%; border: 3px dashed rgba(255,255,255,0.3); z-index: 105; pointer-events: none; animation: pulse-border 2s infinite; }
   #gestureOverlay.active { display: block; }
@@ -155,25 +173,38 @@
 
   @media (max-width: 540px) {
     .blinds { font-size: 2.8rem; } .timer { font-size: 4rem; }
-    .center-info .blinds { font-size: 7rem; } /* Увеличил и на мобильном */
+    .center-info .blinds { font-size: 7rem; }
     .center-info .timer { font-size: 4.5rem; }
     .center-info .next-blinds { font-size: 1.2rem; }
-    .player-node { width: 72px; height: 72px; } .p-name { font-size: 0.75rem; }
+    
+    /* Игроки ближе к столу */
+    .player-node { width: 65px; height: 65px; }
+    .p-name { font-size: 0.7rem; max-width: 55px; }
+    .p-badge { font-size: 0.55rem; }
+    
+    /* Скрываем кнопку комбинаций по краям */
+    #ambCheatBtn { display: none !important; }
+    
+    /* Панель управления на мобильных */
+    #mobileControlBar { display: flex; }
+    
     .table-surface { width: min(85vw, 55vh); height: min(55vw, 35vh); }
-    #ambDealerBtn { bottom: 80px; right: 20px; padding: 10px 16px; font-size: 0.9rem; }
-    #ambCheatBtn { bottom: 80px; left: 20px; padding: 10px 16px; font-size: 0.9rem; }
-    #ambCamBtn { bottom: 140px; padding: 8px 14px; font-size: 0.85rem; }
-    .ambient-hint { top: 15px; left: 15px; }
-    .hand-rank { font-size: 1rem; width: 100px; } .hand-desc { font-size: 0.85rem; }
-    #gestureOverlay { width: 150px; height: 150px; }
+    .ambient-hint { top: 10px; left: 10px; font-size: 0.8rem; }
+    
+    #gestureOverlay { width: 130px; height: 130px; }
   }
 </style>
 </head>
 <body>
 
 <div class="ambient-hint" id="ambientHint">✕ Выход</div>
-<button id="ambDealerBtn">🔄 Дилер</button>
-<button id="ambCheatBtn">📋 Комбинации</button>
+<button id="ambCheatBtn">📋</button>
+
+<!-- Панель управления для мобильных -->
+<div id="mobileControlBar">
+  <button class="mob-btn" onclick="changeDealer(true)">🔄 Дилер</button>
+</div>
+
 <button id="ambCamBtn">📷 Жест</button>
 
 <h1>♠ Покерный таймер ♥</h1>
@@ -195,7 +226,6 @@
     <button class="btn-pause" id="pauseBtn" disabled>Пауза</button>
     <button class="btn-reset" id="resetBtn">Сброс</button>
     <button class="btn-next" id="nextBtn">Уровень ↑</button>
-    <!-- КНОПКА РАЗДАЧА УДАЛЕНА -->
     <button class="btn-reactive" id="reviveAllBtn" title="Вернуть всех в игру">♻️ Все в игре</button>
   </div>
 </div>
@@ -282,7 +312,6 @@ const fixedStructure = [
 ];
 let structure = [...fixedStructure];
 
-// === ЛОГИКА ДИЛЕРА ===
 function getActiveIndices() {
   return players.map((p, i) => p.active ? i : -1).filter(i => i !== -1);
 }
@@ -319,7 +348,6 @@ function changeDealer(silent = false) {
   }
 }
 
-// === MediaPipe (Мобильно-совместимая) ===
 let hands = null;
 let videoLoopId = null;
 
@@ -345,17 +373,10 @@ function initMediaPipe() {
   hands.onResults(results => {
     if (results.multiHandLandmarks && results.multiHandLandmarks.length > 0) {
       const lm = results.multiHandLandmarks[0];
-      
-      // === ЛОГИКА ЖЕСТА "3 ПАЛЬЦА" (👍☝️🖕) ===
-      // 1. Большой палец: отведён в сторону
       const thumbOpen = Math.abs(lm[4].x - lm[0].x) > Math.abs(lm[2].x - lm[0].x);
-      // 2. Указательный: открыт
       const indexOpen = lm[8].y < lm[6].y;
-      // 3. Средний: открыт
       const middleOpen = lm[12].y < lm[10].y;
-      // 4. Безымянный: ЗАКРЫТ
       const ringClosed = lm[16].y > lm[14].y;
-      // 5. Мизинец: ЗАКРЫТ
       const pinkyClosed = lm[20].y > lm[18].y;
       
       const isThreeFingers = thumbOpen && indexOpen && middleOpen && ringClosed && pinkyClosed;
@@ -387,7 +408,7 @@ async function startCamera() {
   try {
     const stream = await navigator.mediaDevices.getUserMedia({
       video: { 
-        facingMode: 'user',  // ФРОНТАЛЬНАЯ КАМЕРА
+        facingMode: 'user',
         width: { ideal: 640 }, 
         height: { ideal: 480 } 
       }
@@ -514,12 +535,16 @@ $('playerName').onkeypress = (e) => { if(e.key==='Enter') addPlayer($('playerNam
 $('ambCheatBtn').onclick = () => $('cheatOverlay').classList.add('active');
 $('closeCheatBtn').onclick = () => $('cheatOverlay').classList.remove('active');
 $('nextDealerBtn').onclick = () => changeDealer(false);
-$('ambDealerBtn').onclick = () => changeDealer(false);
-// $('nextHandBtn').onclick = () => changeDealer(false); // Кнопка удалена
 
 function dealChips(sbIdx, bbIdx) { if (!document.body.classList.contains('ambient')) return; const table = $('ambientTable'); const cx = window.innerWidth / 2; const cy = window.innerHeight / 2; [sbIdx, bbIdx].forEach(idx => { const node = table.querySelector(`.player-node[data-i="${idx}"]`); if (!node) return; const nodeRect = node.getBoundingClientRect(); const targetX = nodeRect.left + nodeRect.width/2; const targetY = nodeRect.top + nodeRect.height/2; const chip = document.createElement('div'); chip.className = 'flying-chip'; chip.style.left = `${cx}px`; chip.style.top = `${cy}px`; table.appendChild(chip); const anim = chip.animate([ { transform: 'translate(-50%, -50%) scale(0.5)', opacity: 0 }, { transform: 'translate(-50%, -50%) scale(1)', opacity: 1, offset: 0.2 }, { transform: `translate(calc(-50% + ${targetX - cx}px), calc(-50% + ${targetY - cy}px)) scale(1)`, opacity: 1, offset: 0.7 }, { transform: `translate(calc(-50% + ${targetX - cx}px), calc(-50% + ${targetY - cy}px)) scale(0.5)`, opacity: 0 } ], { duration: 700, easing: 'ease-in-out' }); anim.onfinish = () => chip.remove(); }); }
 
-function renderAmbientTable() { const table = $('ambientTable'); Array.from(table.querySelectorAll('.player-node')).forEach(el => el.remove()); if (players.length < 1) return; const pos = getPositions(); const count = players.length; const radiusX = 42; const radiusY = 34; players.forEach((p, i) => { const angleDeg = (360 / count) * i - 90; const angleRad = angleDeg * Math.PI / 180; const x = 50 + radiusX * Math.cos(angleRad); const y = 50 + radiusY * Math.sin(angleRad); const node = document.createElement('div'); node.className = 'player-node'; node.dataset.i = i; if (!p.active) node.classList.add('out'); if (i === pos.dealer && p.active) node.classList.add('dealer'); if (i === pos.sb && p.active) node.classList.add('sb'); if (i === pos.bb && p.active) node.classList.add('bb'); let badgeHtml = ''; if (!p.active) badgeHtml = `<div class="p-badge out">OUT</div>`; else if (i === pos.dealer) badgeHtml = `<div class="p-badge d">D</div>`; else if (i === pos.sb) badgeHtml = `<div class="p-badge s">SB</div>`; else if (i === pos.bb) badgeHtml = `<div class="p-badge b">BB</div>`; const name = p.name || `P${i+1}`; const toggleBtn = document.createElement('div'); toggleBtn.className = `amb-toggle-btn ${!p.active ? 'is-out' : ''}`; toggleBtn.innerHTML = !p.active ? '😴' : '😎'; toggleBtn.title = !p.active ? 'Вернуть в игру' : 'Отметить выбывшим'; toggleBtn.onclick = (e) => { e.stopPropagation(); togglePlayerStatus(i); }; node.innerHTML = `<div class="p-name">${name}</div>${badgeHtml}`; node.appendChild(toggleBtn); node.onclick = (e) => { if (e.target === toggleBtn || toggleBtn.contains(e.target)) return; if (p.active && dealerIndex !== i) { dealerIndex = i; renderPlayers(); renderAmbientTable(); playDealerSound(); requestAnimationFrame(() => dealChips(getPositions().sb, getPositions().bb)); } }; node.style.left = `${x}%`; node.style.top = `${y}%`; table.appendChild(node); }); $('ambCamBtn').style.display = 'block'; }
+function renderAmbientTable() { const table = $('ambientTable'); Array.from(table.querySelectorAll('.player-node')).forEach(el => el.remove()); if (players.length < 1) return; const pos = getPositions(); const count = players.length; 
+// Уменьшили радиус на мобильных, чтобы игроки были ближе к столу
+const isMobile = window.innerWidth <= 540;
+const radiusX = isMobile ? 36 : 42; 
+const radiusY = isMobile ? 28 : 34; 
+
+players.forEach((p, i) => { const angleDeg = (360 / count) * i - 90; const angleRad = angleDeg * Math.PI / 180; const x = 50 + radiusX * Math.cos(angleRad); const y = 50 + radiusY * Math.sin(angleRad); const node = document.createElement('div'); node.className = 'player-node'; node.dataset.i = i; if (!p.active) node.classList.add('out'); if (i === pos.dealer && p.active) node.classList.add('dealer'); if (i === pos.sb && p.active) node.classList.add('sb'); if (i === pos.bb && p.active) node.classList.add('bb'); let badgeHtml = ''; if (!p.active) badgeHtml = `<div class="p-badge out">OUT</div>`; else if (i === pos.dealer) badgeHtml = `<div class="p-badge d">D</div>`; else if (i === pos.sb) badgeHtml = `<div class="p-badge s">SB</div>`; else if (i === pos.bb) badgeHtml = `<div class="p-badge b">BB</div>`; const name = p.name || `P${i+1}`; const toggleBtn = document.createElement('div'); toggleBtn.className = `amb-toggle-btn ${!p.active ? 'is-out' : ''}`; toggleBtn.innerHTML = !p.active ? '😴' : '😎'; toggleBtn.title = !p.active ? 'Вернуть в игру' : 'Отметить выбывшим'; toggleBtn.onclick = (e) => { e.stopPropagation(); togglePlayerStatus(i); }; node.innerHTML = `<div class="p-name">${name}</div>${badgeHtml}`; node.appendChild(toggleBtn); node.onclick = (e) => { if (e.target === toggleBtn || toggleBtn.contains(e.target)) return; if (p.active && dealerIndex !== i) { dealerIndex = i; renderPlayers(); renderAmbientTable(); playDealerSound(); requestAnimationFrame(() => dealChips(getPositions().sb, getPositions().bb)); } }; node.style.left = `${x}%`; node.style.top = `${y}%`; table.appendChild(node); }); $('ambCamBtn').style.display = 'block'; $('ambCheatBtn').style.display = 'block'; }
 
 function updateUI() { const lvl = structure[levelIndex] || structure[structure.length-1]; $('levelNum').textContent = levelIndex + 1; $('sb').textContent = lvl.sb; $('bb').textContent = lvl.bb; $('timer').textContent = formatTime(timeLeft); $('ambLevel').textContent = levelIndex + 1; $('ambSb').textContent = lvl.sb; $('ambBb').textContent = lvl.bb; $('ambTimer').textContent = formatTime(timeLeft); const nextEl = $('nextLevel'); const ambNextEl = $('ambNextBlinds'); let nextHtml = ''; if (levelIndex + 1 < structure.length) { const next = structure[levelIndex+1]; nextHtml = `Далее: <span>${next.sb} / ${next.bb}</span>`; } else { nextHtml = '🏆 <span>Финал</span>'; } nextEl.innerHTML = nextHtml; ambNextEl.innerHTML = nextHtml; const timerEl = $('timer'), ambTimerEl = $('ambTimer'); const isWarn = timeLeft <= 60 && timeLeft > 10; const isDanger = timeLeft <= 10; timerEl.classList.toggle('warning', isWarn); timerEl.classList.toggle('danger', isDanger); ambTimerEl.classList.toggle('warning', isWarn); ambTimerEl.classList.toggle('danger', isDanger); if (isRunning) $('status').textContent = '⏱ Игра идет...'; else if (isPaused) $('status').textContent = '⏸ Пауза'; else $('status').textContent = players.length ? '🟢 Готов к старту' : '➕ Добавьте игроков'; }
 
