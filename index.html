@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>Покерный таймер + Круглый стол</title>
+<title>Покерный таймер + Жесты</title>
 <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js" crossorigin="anonymous"></script>
 <script src="https://cdn.jsdelivr.net/npm/@mediapipe/hands/hands.js" crossorigin="anonymous"></script>
 <style>
@@ -28,7 +28,7 @@
   .btn-next { background: #546e7a; color: white; }
   .btn-ambient { background: #7b1fa2; color: white; font-size: 1.2rem; padding: 6px 12px; }
   .btn-dealer { background: var(--dealer); color: white; }
-  .btn-reactive { background: #009688; color: white; }
+  .btn-reactive { background: #009688; color: white; } 
 
   .btn-remove { background: rgba(244, 67, 54, 0.2); color: var(--danger); padding: 4px 8px; font-size: 0.8rem; border-radius: 4px; border: 1px solid var(--danger); margin-left: 5px;}
   .btn-remove:hover { background: var(--danger); color: white; }
@@ -71,10 +71,13 @@
 
   .table-surface { width: min(75vw, 60vh); height: min(50vw, 40vh); border-radius: 35% / 50%; background: #1e331e; border: 8px solid #2a4a2a; position: relative; box-shadow: 0 0 80px rgba(0,0,0,0.9), inset 0 0 40px rgba(0,0,0,0.8); }
   .felt-texture { position: absolute; top:0; left:0; width:100%; height:100%; border-radius: 35% / 50%; background-image: url("data:image/svg+xml,%3Csvg width='6' height='6' viewBox='0 0 6 6' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%23000000' fill-opacity='0.1' fill-rule='evenodd'%3E%3Cpath d='M5 0h1L0 6V5zM6 5v1H5z'/%3E%3C/g%3E%3C/svg%3E"); opacity: 0.3; pointer-events: none; }
-
+  
   .center-info { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); text-align: center; z-index: 5; pointer-events: none; color: #e8f5e9; text-shadow: 0 2px 8px rgba(0,0,0,0.8); width: 100%; }
   .center-info .level { font-size: 1.2rem; opacity: 0.7; margin-bottom: 5px; }
-  .center-info .blinds { font-size: 4.5rem; font-weight: 800; margin: 8px 0; line-height: 1.1; }
+  
+  /* УВЕЛИЧЕННЫЕ БЛАЙНДЫ */
+  .center-info .blinds { font-size: 9rem; font-weight: 800; margin: 10px 0; line-height: 1.1; }
+  
   .center-info .timer { font-size: 6rem; font-variant-numeric: tabular-nums; letter-spacing: 2px; font-weight: 700; }
   .center-info .timer.warning { color: var(--warn); }
   .center-info .timer.danger { color: var(--danger); animation: pulse 0.8s infinite; }
@@ -97,13 +100,13 @@
   .amb-toggle-btn { position: absolute; top: -4px; right: -4px; width: 24px; height: 24px; border-radius: 50%; background: #333; color: white; font-size: 14px; line-height: 24px; text-align: center; opacity: 0.8; transition: 0.2s; cursor: pointer; z-index: 12; border: 2px solid #1e331e; box-shadow: 0 2px 5px rgba(0,0,0,0.5); display: flex; align-items: center; justify-content: center; }
   .player-node:hover .amb-toggle-btn, .player-node:active .amb-toggle-btn { opacity: 1; transform: scale(1.1); }
   .amb-toggle-btn.is-out { background: var(--danger); opacity: 1; border-color: #500; }
-
+  
   .flying-chip { position: absolute; width: 30px; height: 30px; border-radius: 50%; background: radial-gradient(circle at 30% 30%, #fff, #ffd700, #b8860b); border: 2px dashed #b8860b; box-shadow: 0 4px 10px rgba(0,0,0,0.6); z-index: 20; pointer-events: none; display: flex; align-items: center; justify-content: center; }
   .flying-chip::after { content: '$'; color: #5c4003; font-weight: bold; font-size: 14px; }
 
   #ambDealerBtn { position: fixed; bottom: 30px; right: 30px; z-index: 101; padding: 12px 20px; background: rgba(33,150,243,0.9); border: none; color: #fff; border-radius: 30px; cursor: pointer; font-size: 1rem; box-shadow: 0 4px 15px rgba(0,0,0,0.5); transition: 0.2s; backdrop-filter: blur(4px); font-weight: bold; }
   #ambDealerBtn:hover { transform: scale(1.05); background: #1976d2; }
-
+  
   #ambCheatBtn { position: fixed; bottom: 30px; left: 30px; z-index: 101; padding: 12px 20px; background: rgba(93, 64, 55, 0.9); border: none; color: #fff; border-radius: 30px; cursor: pointer; font-size: 1rem; box-shadow: 0 4px 15px rgba(0,0,0,0.5); transition: 0.2s; backdrop-filter: blur(4px); font-weight: bold; }
   #ambCheatBtn:hover { transform: scale(1.05); background: #4e342e; }
 
@@ -111,7 +114,23 @@
   #ambCamBtn:hover { transform: translateX(-50%) scale(1.05); background: #1b5e20; }
   #ambCamBtn.active { background: #c62828; }
 
-  .ambient-hint { position: fixed; top: 20px; left: 50%; transform: translateX(-50%); text-align: center; color: #fff; font-size: 0.85rem; z-index: 101; cursor: pointer; padding: 6px 12px; background: rgba(0,0,0,0.4); border-radius: 20px; backdrop-filter: blur(4px); border: 1px solid rgba(255,255,255,0.1); transition: 0.2s; }
+  /* ВЫХОД В ЛЕВОМ УГЛУ */
+  .ambient-hint { 
+    position: fixed; 
+    top: 20px; 
+    left: 20px; 
+    text-align: center; 
+    color: #fff; 
+    font-size: 0.85rem; 
+    z-index: 101; 
+    cursor: pointer; 
+    padding: 6px 12px; 
+    background: rgba(0,0,0,0.4); 
+    border-radius: 20px; 
+    backdrop-filter: blur(4px); 
+    border: 1px solid rgba(255,255,255,0.1); 
+    transition: 0.2s; 
+  }
   .ambient-hint:hover { background: rgba(0,0,0,0.6); }
 
   #gestureOverlay { display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 180px; height: 180px; border-radius: 50%; border: 3px dashed rgba(255,255,255,0.3); z-index: 105; pointer-events: none; animation: pulse-border 2s infinite; }
@@ -136,14 +155,15 @@
 
   @media (max-width: 540px) {
     .blinds { font-size: 2.8rem; } .timer { font-size: 4rem; }
-    .center-info .blinds { font-size: 3.5rem; } .center-info .timer { font-size: 4.5rem; }
+    .center-info .blinds { font-size: 7rem; } /* Увеличил и на мобильном */
+    .center-info .timer { font-size: 4.5rem; }
     .center-info .next-blinds { font-size: 1.2rem; }
     .player-node { width: 72px; height: 72px; } .p-name { font-size: 0.75rem; }
     .table-surface { width: min(85vw, 55vh); height: min(55vw, 35vh); }
     #ambDealerBtn { bottom: 80px; right: 20px; padding: 10px 16px; font-size: 0.9rem; }
     #ambCheatBtn { bottom: 80px; left: 20px; padding: 10px 16px; font-size: 0.9rem; }
     #ambCamBtn { bottom: 140px; padding: 8px 14px; font-size: 0.85rem; }
-    .ambient-hint { top: 15px; }
+    .ambient-hint { top: 15px; left: 15px; }
     .hand-rank { font-size: 1rem; width: 100px; } .hand-desc { font-size: 0.85rem; }
     #gestureOverlay { width: 150px; height: 150px; }
   }
@@ -175,7 +195,7 @@
     <button class="btn-pause" id="pauseBtn" disabled>Пауза</button>
     <button class="btn-reset" id="resetBtn">Сброс</button>
     <button class="btn-next" id="nextBtn">Уровень ↑</button>
-    <button class="btn-dealer" id="nextHandBtn">🃏 Раздача</button>
+    <!-- КНОПКА РАЗДАЧА УДАЛЕНА -->
     <button class="btn-reactive" id="reviveAllBtn" title="Вернуть всех в игру">♻️ Все в игре</button>
   </div>
 </div>
@@ -211,7 +231,7 @@
     </div>
     <div id="gestureOverlay"></div>
   </div>
-  <div id="gestureStatus">✋ Покажите 5 пальцев</div>
+  <div id="gestureStatus">👌 Покажите 3 пальца</div>
 </div>
 
 <div class="cheatsheet-overlay" id="cheatOverlay">
@@ -231,7 +251,6 @@
   </div>
 </div>
 
-<!-- Исправленный video тег с playsinline для iOS -->
 <video id="camVideo" autoplay playsinline muted style="display:none; position:fixed; top:10px; right:10px; width:120px; border-radius:8px; opacity:0.7; z-index:99; border:2px solid #333;"></video>
 
 <script>
@@ -239,9 +258,9 @@ let levelIndex = 0, timeLeft = 10 * 60, timerInterval = null;
 let isRunning = false, isPaused = false, audioCtx = null, wakeLock = null;
 let warn60 = false, warn30 = false;
 let players = [], dealerIndex = 0;
-let deleteConfirmId = null;
+let deleteConfirmId = null; 
 
-let gestureSettings = { holdTime: 5000, cooldown: 8000 };
+let gestureSettings = { holdTime: 1000, cooldown: 3000 };
 let gestureState = { active: false, holding: 0, lastTrigger: 0, mpReady: false, stream: null, running: false };
 
 const $ = id => document.getElementById(id);
@@ -263,7 +282,7 @@ const fixedStructure = [
 ];
 let structure = [...fixedStructure];
 
-// === ИСПРАВЛЕННАЯ ЛОГИКА ДИЛЕРА ===
+// === ЛОГИКА ДИЛЕРА ===
 function getActiveIndices() {
   return players.map((p, i) => p.active ? i : -1).filter(i => i !== -1);
 }
@@ -274,10 +293,10 @@ function getPositions() {
   let pos = active.indexOf(dealerIndex);
   if (pos === -1) pos = 0;
   const n = active.length;
-  return {
-    dealer: active[pos],
-    sb: active[(pos + 1) % n],
-    bb: active[(pos + 2) % n]
+  return { 
+    dealer: active[pos], 
+    sb: active[(pos + 1) % n], 
+    bb: active[(pos + 2) % n] 
   };
 }
 
@@ -287,10 +306,10 @@ function changeDealer(silent = false) {
   const currentPos = active.indexOf(dealerIndex);
   const nextPos = (currentPos === -1 ? 0 : currentPos + 1) % active.length;
   dealerIndex = active[nextPos];
-
+  
   renderPlayers();
   renderAmbientTable();
-
+  
   if (!silent) {
     playDealerSound();
     requestAnimationFrame(() => {
@@ -300,7 +319,7 @@ function changeDealer(silent = false) {
   }
 }
 
-// === MediaPipe Инициализация (Мобильно-совместимая) ===
+// === MediaPipe (Мобильно-совместимая) ===
 let hands = null;
 let videoLoopId = null;
 
@@ -312,59 +331,52 @@ function showGestureError(msg) {
 
 function initMediaPipe() {
   if(typeof Hands === 'undefined') {
-    showGestureError('❌ Не удалось загрузить ML-модель. Проверьте интернет и перезагрузите.');
+    showGestureError('❌ ML не загружена');
     return false;
   }
-
-  // Проверка HTTPS (обязательно для мобильных)
   if (!window.isSecureContext && location.hostname !== 'localhost') {
-    showGestureError('🔒 Камера требует HTTPS или localhost. Откройте сайт по защищённой ссылке.');
+    showGestureError('🔒 Нужен HTTPS');
     return false;
   }
 
   hands = new Hands({locateFile: (file) => `https://cdn.jsdelivr.net/npm/@mediapipe/hands/${file}`});
   hands.setOptions({ maxNumHands: 1, modelComplexity: 1, minDetectionConfidence: 0.6, minTrackingConfidence: 0.5 });
-
+  
   hands.onResults(results => {
     if (results.multiHandLandmarks && results.multiHandLandmarks.length > 0) {
-      // === Новая логика: 3 пальца (большой + указательный + средний) ===
-const lm = results.multiHandLandmarks[0];
+      const lm = results.multiHandLandmarks[0];
+      
+      // === ЛОГИКА ЖЕСТА "3 ПАЛЬЦА" (👍☝️🖕) ===
+      // 1. Большой палец: отведён в сторону
+      const thumbOpen = Math.abs(lm[4].x - lm[0].x) > Math.abs(lm[2].x - lm[0].x);
+      // 2. Указательный: открыт
+      const indexOpen = lm[8].y < lm[6].y;
+      // 3. Средний: открыт
+      const middleOpen = lm[12].y < lm[10].y;
+      // 4. Безымянный: ЗАКРЫТ
+      const ringClosed = lm[16].y > lm[14].y;
+      // 5. Мизинец: ЗАКРЫТ
+      const pinkyClosed = lm[20].y > lm[18].y;
+      
+      const isThreeFingers = thumbOpen && indexOpen && middleOpen && ringClosed && pinkyClosed;
 
-// 1. Большой палец: отведён в сторону (сравниваем по X от запястья)
-const thumbOpen = Math.abs(lm[4].x - lm[0].x) > Math.abs(lm[2].x - lm[0].x);
-
-// 2. Указательный: кончик (8) выше сустава (6)
-const indexOpen = lm[8].y < lm[6].y;
-
-// 3. Средний: кончик (12) выше сустава (10)
-const middleOpen = lm[12].y < lm[10].y;
-
-// 4. Безымянный: закрыт (кончик 16 ниже сустава 14)
-const ringClosed = lm[16].y > lm[14].y;
-
-// 5. Мизинец: закрыт (кончик 20 ниже сустава 18)
-const pinkyClosed = lm[20].y > lm[18].y;
-
-// Жест распознан, если 3 пальца открыты, 2 закрыты
-const isThreeFingers = thumbOpen && indexOpen && middleOpen && ringClosed && pinkyClosed;
-
-if (isThreeFingers) {
-  gestureState.holding += 100;
-  $('gestureOverlay').classList.add('detected');
-  $('gestureStatus').textContent = `👌 3 пальца... ${(gestureState.holding/1000).toFixed(1)}s`;
-  
-  if (gestureState.holding >= gestureSettings.holdTime && (Date.now() - gestureState.lastTrigger >= gestureSettings.cooldown)) {
-    triggerGestureDealer();
-  }
-} else {
-  gestureState.holding = Math.max(0, gestureState.holding - 300);
-  $('gestureOverlay').classList.remove('detected');
-  $('gestureStatus').textContent = gestureState.holding > 200 ? '👌 Почти...' : '👌 Покажите 3 пальца';
-}
+      if (isThreeFingers) {
+        gestureState.holding += 100;
+        $('gestureOverlay').classList.add('detected');
+        $('gestureStatus').textContent = `👌 3 пальца... ${(gestureState.holding/1000).toFixed(1)}s`;
+        
+        if (gestureState.holding >= gestureSettings.holdTime && (Date.now() - gestureState.lastTrigger >= gestureSettings.cooldown)) {
+          triggerGestureDealer();
+        }
+      } else {
+        gestureState.holding = Math.max(0, gestureState.holding - 300);
+        $('gestureOverlay').classList.remove('detected');
+        $('gestureStatus').textContent = gestureState.holding > 200 ? '👌 Почти...' : '👌 Покажите 3 пальца';
+      }
     } else {
       gestureState.holding = Math.max(0, gestureState.holding - 300);
       $('gestureOverlay').classList.remove('detected');
-      $('gestureStatus').textContent = '✋ Покажите 3 пальца';
+      $('gestureStatus').textContent = '👌 Покажите 3 пальца';
     }
   });
   gestureState.mpReady = true;
@@ -374,41 +386,39 @@ if (isThreeFingers) {
 async function startCamera() {
   try {
     const stream = await navigator.mediaDevices.getUserMedia({
-      video: { facingMode: 'user', width: { ideal: 640 }, height: { ideal: 480 } }
+      video: { 
+        facingMode: 'user',  // ФРОНТАЛЬНАЯ КАМЕРА
+        width: { ideal: 640 }, 
+        height: { ideal: 480 } 
+      }
     });
-
+    
     const video = $('camVideo');
     video.srcObject = stream;
     video.setAttribute('playsinline', true);
     video.setAttribute('muted', true);
     await video.play();
-
+    
     gestureState.stream = stream;
     gestureState.running = true;
     gestureState.holding = 0;
-
-    // Ручной цикл кадров (стабильнее на iOS, чем MediaPipe Camera utils)
+    
     const sendFrame = async () => {
       if (!gestureState.running || !hands || !video.videoWidth) {
         videoLoopId = requestAnimationFrame(sendFrame);
         return;
       }
-      try {
-        await hands.send({image: video});
-      } catch(e) {
-        // Игнорируем ошибки во время переключения фокуса
-      }
+      try { await hands.send({image: video}); } catch(e) {}
       videoLoopId = requestAnimationFrame(sendFrame);
     };
     videoLoopId = requestAnimationFrame(sendFrame);
-
     return true;
   } catch(err) {
     console.error('Camera error:', err);
     if (err.name === 'NotAllowedError') {
-      showGestureError('🔒 Разрешите доступ к камере в настройках браузера. Требуется HTTPS.');
+      showGestureError('🔒 Разрешите доступ к камере.');
     } else {
-      showGestureError(`⚠️ Ошибка камеры: ${err.message}`);
+      showGestureError(`⚠️ Ошибка: ${err.message}`);
     }
     return false;
   }
@@ -427,13 +437,11 @@ function stopCamera() {
 function triggerGestureDealer() {
   gestureState.lastTrigger = Date.now();
   gestureState.holding = 0;
-
   changeDealer(true);
   const pos = getPositions();
-
   playDealerSound();
   dealChips(pos.sb, pos.bb);
-
+  
   const nextName = players[pos.dealer]?.name || `P${pos.dealer+1}`;
   $('gestureStatus').textContent = `✅ Дилер → ${nextName}`;
   $('gestureOverlay').classList.remove('detected');
@@ -449,7 +457,7 @@ function toggleCamera() {
     $('ambCamBtn').textContent = '⏹ Стоп';
     $('gestureOverlay').classList.add('active');
     $('gestureStatus').classList.add('active');
-    $('gestureStatus').textContent = '⏳ Запуск камеры...';
+    $('gestureStatus').textContent = '⏳ Запуск...';
     startCamera();
   } else {
     stopCamera();
@@ -462,7 +470,6 @@ function toggleCamera() {
 
 $('ambCamBtn').onclick = toggleCamera;
 
-// === Остальной код ===
 function initAudio() { if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)(); if (audioCtx.state === 'suspended') audioCtx.resume(); }
 function playDealerSound() { try { initAudio(); const now = audioCtx.currentTime; [880, 1100].forEach((freq, i) => { const o = audioCtx.createOscillator(), g = audioCtx.createGain(); o.type = 'sine'; o.frequency.value = freq; o.connect(g); g.connect(audioCtx.destination); const t = now + i * 0.08; o.start(t); o.stop(t + 0.1); g.gain.setValueAtTime(0, t); g.gain.linearRampToValueAtTime(0.3, t + 0.02); g.gain.exponentialRampToValueAtTime(0.01, t + 0.1); }); if(navigator.vibrate) navigator.vibrate(30); } catch(e){} }
 function playLevelUpSound() { try { initAudio(); const now = audioCtx.currentTime; const o = audioCtx.createOscillator(), g = audioCtx.createGain(); o.type = 'triangle'; o.frequency.setValueAtTime(440, now); o.frequency.linearRampToValueAtTime(880, now + 0.3); o.connect(g); g.connect(audioCtx.destination); o.start(now); o.stop(now + 0.3); g.gain.setValueAtTime(0.5, now); g.gain.linearRampToValueAtTime(0, now + 0.3); if(navigator.vibrate) navigator.vibrate([100, 50, 100]); } catch(e){} }
@@ -479,7 +486,7 @@ function togglePlayerStatus(index) {
   const posBefore = getPositions();
   players[index].active = !players[index].active;
   if (wasActive && !players[index].active) {
-      if (index === posBefore.dealer || index === posBefore.sb || index === posBefore.bb) changeDealer(true);
+      if (index === posBefore.dealer || index === posBefore.sb || index === posBefore.bb) changeDealer(true); 
   }
   renderPlayers();
   renderAmbientTable();
@@ -508,7 +515,7 @@ $('ambCheatBtn').onclick = () => $('cheatOverlay').classList.add('active');
 $('closeCheatBtn').onclick = () => $('cheatOverlay').classList.remove('active');
 $('nextDealerBtn').onclick = () => changeDealer(false);
 $('ambDealerBtn').onclick = () => changeDealer(false);
-$('nextHandBtn').onclick = () => changeDealer(false);
+// $('nextHandBtn').onclick = () => changeDealer(false); // Кнопка удалена
 
 function dealChips(sbIdx, bbIdx) { if (!document.body.classList.contains('ambient')) return; const table = $('ambientTable'); const cx = window.innerWidth / 2; const cy = window.innerHeight / 2; [sbIdx, bbIdx].forEach(idx => { const node = table.querySelector(`.player-node[data-i="${idx}"]`); if (!node) return; const nodeRect = node.getBoundingClientRect(); const targetX = nodeRect.left + nodeRect.width/2; const targetY = nodeRect.top + nodeRect.height/2; const chip = document.createElement('div'); chip.className = 'flying-chip'; chip.style.left = `${cx}px`; chip.style.top = `${cy}px`; table.appendChild(chip); const anim = chip.animate([ { transform: 'translate(-50%, -50%) scale(0.5)', opacity: 0 }, { transform: 'translate(-50%, -50%) scale(1)', opacity: 1, offset: 0.2 }, { transform: `translate(calc(-50% + ${targetX - cx}px), calc(-50% + ${targetY - cy}px)) scale(1)`, opacity: 1, offset: 0.7 }, { transform: `translate(calc(-50% + ${targetX - cx}px), calc(-50% + ${targetY - cy}px)) scale(0.5)`, opacity: 0 } ], { duration: 700, easing: 'ease-in-out' }); anim.onfinish = () => chip.remove(); }); }
 
