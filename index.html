@@ -364,7 +364,7 @@ if (isThreeFingers) {
     } else {
       gestureState.holding = Math.max(0, gestureState.holding - 300);
       $('gestureOverlay').classList.remove('detected');
-      $('gestureStatus').textContent = '✋ Покажите 5 пальцев';
+      $('gestureStatus').textContent = '✋ Покажите 3 пальца';
     }
   });
   gestureState.mpReady = true;
