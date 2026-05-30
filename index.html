@@ -327,26 +327,40 @@ function initMediaPipe() {
 
   hands.onResults(results => {
     if (results.multiHandLandmarks && results.multiHandLandmarks.length > 0) {
-      const lm = results.multiHandLandmarks[0];
-      const fingersOpen = [
-        lm[8].y < lm[6].y, lm[12].y < lm[10].y, lm[16].y < lm[14].y, lm[20].y < lm[18].y
-      ];
-      const thumbOpen = Math.abs(lm[4].x - lm[0].x) > Math.abs(lm[3].x - lm[0].x);
-      const isOpen = fingersOpen.every(Boolean) && thumbOpen;
+      // === Новая логика: 3 пальца (большой + указательный + средний) ===
+const lm = results.multiHandLandmarks[0];
 
-      if (isOpen) {
-        gestureState.holding += 100;
-        $('gestureOverlay').classList.add('detected');
-        $('gestureStatus').textContent = `✋ Удержание... ${(gestureState.holding/1000).toFixed(1)}s`;
+// 1. Большой палец: отведён в сторону (сравниваем по X от запястья)
+const thumbOpen = Math.abs(lm[4].x - lm[0].x) > Math.abs(lm[2].x - lm[0].x);
 
-        if (gestureState.holding >= gestureSettings.holdTime && (Date.now() - gestureState.lastTrigger >= gestureSettings.cooldown)) {
-          triggerGestureDealer();
-        }
-      } else {
-        gestureState.holding = Math.max(0, gestureState.holding - 300);
-        $('gestureOverlay').classList.remove('detected');
-        $('gestureStatus').textContent = gestureState.holding > 200 ? '✋ Почти...' : '✋ Покажите 5 пальцев';
-      }
+// 2. Указательный: кончик (8) выше сустава (6)
+const indexOpen = lm[8].y < lm[6].y;
+
+// 3. Средний: кончик (12) выше сустава (10)
+const middleOpen = lm[12].y < lm[10].y;
+
+// 4. Безымянный: закрыт (кончик 16 ниже сустава 14)
+const ringClosed = lm[16].y > lm[14].y;
+
+// 5. Мизинец: закрыт (кончик 20 ниже сустава 18)
+const pinkyClosed = lm[20].y > lm[18].y;
+
+// Жест распознан, если 3 пальца открыты, 2 закрыты
+const isThreeFingers = thumbOpen && indexOpen && middleOpen && ringClosed && pinkyClosed;
+
+if (isThreeFingers) {
+  gestureState.holding += 100;
+  $('gestureOverlay').classList.add('detected');
+  $('gestureStatus').textContent = `👌 3 пальца... ${(gestureState.holding/1000).toFixed(1)}s`;
+  
+  if (gestureState.holding >= gestureSettings.holdTime && (Date.now() - gestureState.lastTrigger >= gestureSettings.cooldown)) {
+    triggerGestureDealer();
+  }
+} else {
+  gestureState.holding = Math.max(0, gestureState.holding - 300);
+  $('gestureOverlay').classList.remove('detected');
+  $('gestureStatus').textContent = gestureState.holding > 200 ? '👌 Почти...' : '👌 Покажите 3 пальца';
+}
     } else {
       gestureState.holding = Math.max(0, gestureState.holding - 300);
       $('gestureOverlay').classList.remove('detected');
