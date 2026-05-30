@@ -1,0 +1,525 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Покерный таймер + Круглый стол</title>
+<script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/@mediapipe/hands/hands.js" crossorigin="anonymous"></script>
+<style>
+  :root { --bg: #121c12; --panel: #1e331e; --accent: #4caf50; --text: #e8f5e9; --warn: #ff9800; --danger: #f44336; --dealer: #2196f3; --out: #555; }
+  * { box-sizing: border-box; margin: 0; padding: 0; font-family: system-ui, -apple-system, sans-serif; -webkit-tap-highlight-color: transparent; }
+  body { background: var(--bg); color: var(--text); min-height: 100vh; display: flex; flex-direction: column; align-items: center; padding: 20px; transition: 0.3s; overflow-x: hidden; }
+  h1 { margin-bottom: 10px; font-size: 1.6rem; letter-spacing: 1px; text-align: center; }
+
+  .controls { background: var(--panel); padding: 15px; border-radius: 12px; margin-bottom: 20px; width: 100%; max-width: 600px; display: flex; flex-direction: column; gap: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.3); }
+  .row { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; justify-content: center; }
+  .row label { font-size: 0.9rem; white-space: nowrap; }
+  .row input, .row select { padding: 8px; border-radius: 6px; border: 1px solid #444; background: #0a120a; color: white; width: 80px; font-size: 1rem; }
+  .player-input { display: flex; gap: 6px; width: 100%; }
+  .player-input input { flex: 1; min-width: 0; padding: 8px; border-radius: 6px; border: 1px solid #444; background: #0a120a; color: white; }
+
+  button { padding: 10px 16px; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; transition: 0.2s; font-size: 0.95rem; touch-action: manipulation; }
+  button:active { transform: scale(0.96); }
+  button:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+  .btn-start { background: var(--accent); color: white; }
+  .btn-pause { background: var(--warn); color: #111; }
+  .btn-reset { background: var(--danger); color: white; }
+  .btn-next { background: #546e7a; color: white; }
+  .btn-ambient { background: #7b1fa2; color: white; font-size: 1.2rem; padding: 6px 12px; }
+  .btn-dealer { background: var(--dealer); color: white; }
+  .btn-reactive { background: #009688; color: white; }
+
+  .btn-remove { background: rgba(244, 67, 54, 0.2); color: var(--danger); padding: 4px 8px; font-size: 0.8rem; border-radius: 4px; border: 1px solid var(--danger); margin-left: 5px;}
+  .btn-remove:hover { background: var(--danger); color: white; }
+  .btn-remove.confirm-mode { background: var(--danger); color: white; animation: pulse-btn 1s infinite; }
+  @keyframes pulse-btn { 0% { opacity: 1; } 50% { opacity: 0.7; } 100% { opacity: 1; } }
+
+  .btn-status { background: rgba(255,255,255,0.1); color: #aaa; padding: 4px 8px; font-size: 0.9rem; border-radius: 4px; border: 1px solid #444; margin-right: 5px; line-height: 1; }
+  .btn-status.active { color: #fff; border-color: var(--accent); background: rgba(76, 175, 80, 0.1); }
+  .btn-status.out { color: var(--danger); border-color: var(--danger); background: rgba(244, 67, 54, 0.1); }
+
+  .display { background: var(--panel); padding: 25px; border-radius: 16px; width: 100%; max-width: 600px; text-align: center; box-shadow: 0 8px 24px rgba(0,0,0,0.5); margin-bottom: 20px; position: relative; overflow: hidden; }
+  .level { font-size: 1.1rem; opacity: 0.8; margin-bottom: 5px; text-transform: uppercase; letter-spacing: 1px; }
+  .blinds { font-size: 3.5rem; font-weight: 800; margin: 10px 0; line-height: 1; background: linear-gradient(to bottom, #fff, #ccc); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+  .timer { font-size: 5rem; font-variant-numeric: tabular-nums; margin: 15px 0; letter-spacing: 2px; font-weight: 700; }
+  .timer.warning { color: var(--warn); -webkit-text-fill-color: var(--warn); }
+  .timer.danger { color: var(--danger); -webkit-text-fill-color: var(--danger); animation: pulse 1s infinite; }
+  .next-level { font-size: 0.9rem; opacity: 0.6; margin-top: 8px; min-height: 1.2em; }
+  .next-level span { color: var(--accent); font-weight: 600; }
+  .status { margin-top: 15px; font-size: 0.9rem; opacity: 0.6; font-style: italic; }
+  @keyframes pulse { 50% { opacity: 0.6; transform: scale(0.98); } }
+
+  .players-section { background: var(--panel); padding: 15px; border-radius: 12px; width: 100%; max-width: 600px; margin-bottom: 20px; }
+  .players-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; flex-wrap: wrap; gap: 10px; }
+  .players-list { display: flex; flex-direction: row; flex-wrap: wrap; gap: 8px; justify-content: center; }
+
+  .player-item { display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 8px 12px; background: #152615; border-radius: 8px; font-size: 0.9rem; min-width: 80px; border: 1px solid #333; transition: 0.3s; position: relative; }
+  .player-item.out { opacity: 0.5; filter: grayscale(1); border-color: #333; }
+  .player-item.dealer { border-color: var(--dealer); background: #1a2a3a; box-shadow: 0 0 10px rgba(33,150,243,0.2); }
+  .player-item.sb { border-color: var(--warn); background: #2a2515; }
+  .player-item.bb { border-color: var(--danger); background: #2a1515; }
+  .player-name { margin-bottom: 4px; font-weight: 500; white-space: nowrap; max-width: 100px; overflow: hidden; text-overflow: ellipsis; }
+  .player-badge { font-size: 0.7rem; padding: 2px 6px; border-radius: 4px; margin-top: 2px; font-weight: bold; transition: 0.3s; }
+  .badge-dealer { background: var(--dealer); color: white; }
+  .badge-sb { background: var(--warn); color: black; }
+  .badge-bb { background: var(--danger); color: white; }
+
+  #ambientTable { display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: radial-gradient(circle at center, #0f1a0f 0%, #050805 100%); z-index: 100; align-items: center; justify-content: center; touch-action: none; }
+  body.ambient #ambientTable { display: flex; }
+  body.ambient > *:not(#ambientTable):not(#ambDealerBtn):not(#ambCheatBtn):not(#ambCamBtn):not(.ambient-hint):not(.cheatsheet-overlay):not(#gestureOverlay):not(#gestureStatus) { display: none !important; }
+
+  .table-surface { width: min(75vw, 60vh); height: min(50vw, 40vh); border-radius: 35% / 50%; background: #1e331e; border: 8px solid #2a4a2a; position: relative; box-shadow: 0 0 80px rgba(0,0,0,0.9), inset 0 0 40px rgba(0,0,0,0.8); }
+  .felt-texture { position: absolute; top:0; left:0; width:100%; height:100%; border-radius: 35% / 50%; background-image: url("data:image/svg+xml,%3Csvg width='6' height='6' viewBox='0 0 6 6' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%23000000' fill-opacity='0.1' fill-rule='evenodd'%3E%3Cpath d='M5 0h1L0 6V5zM6 5v1H5z'/%3E%3C/g%3E%3C/svg%3E"); opacity: 0.3; pointer-events: none; }
+
+  .center-info { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); text-align: center; z-index: 5; pointer-events: none; color: #e8f5e9; text-shadow: 0 2px 8px rgba(0,0,0,0.8); width: 100%; }
+  .center-info .level { font-size: 1.2rem; opacity: 0.7; margin-bottom: 5px; }
+  .center-info .blinds { font-size: 4.5rem; font-weight: 800; margin: 8px 0; line-height: 1.1; }
+  .center-info .timer { font-size: 6rem; font-variant-numeric: tabular-nums; letter-spacing: 2px; font-weight: 700; }
+  .center-info .timer.warning { color: var(--warn); }
+  .center-info .timer.danger { color: var(--danger); animation: pulse 0.8s infinite; }
+  .center-info .next-blinds { font-size: 1.5rem; opacity: 0.7; margin-top: 10px; font-weight: 500; letter-spacing: 1px; white-space: nowrap; }
+  .center-info .next-blinds span { color: var(--accent); font-weight: 700; font-size: 1.1em; }
+
+  .player-node { position: absolute; width: 84px; height: 84px; border-radius: 50%; background: #2a3d2a; border: 2px solid #555; display: flex; flex-direction: column; justify-content: center; align-items: center; transform: translate(-50%, -50%); transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1); box-shadow: 0 4px 12px rgba(0,0,0,0.8); color: white; font-size: 0.8rem; text-align: center; cursor: pointer; z-index: 6; user-select: none; padding: 4px; }
+  .player-node:active { transform: translate(-50%, -50%) scale(0.95); }
+  .player-node.out { opacity: 0.3; filter: grayscale(1); border-color: #333; background: #1a1a1a; box-shadow: none; }
+  .player-node.dealer { border-color: #2196f3; background: #1a2a3a; box-shadow: 0 0 20px rgba(33,150,243,0.5); transform: translate(-50%, -50%) scale(1.15); z-index: 7; }
+  .player-node.sb { border-color: #ff9800; background: #2a2515; }
+  .player-node.bb { border-color: #f44336; background: #2a1515; }
+  .p-name { font-size: 0.85rem; width: 100%; max-height: 2.4em; overflow: hidden; text-overflow: ellipsis; white-space: normal; word-break: break-word; line-height: 1.1; font-weight: 700; pointer-events: none; margin-bottom: 2px; text-shadow: 0 1px 2px rgba(0,0,0,0.8); }
+  .p-badge { font-size: 0.65rem; padding: 2px 6px; border-radius: 4px; margin-top: 2px; font-weight: bold; pointer-events: none; line-height: 1; transition: 0.3s; }
+  .p-badge.d { background: #2196f3; color: white; }
+  .p-badge.s { background: #ff9800; color: #000; }
+  .p-badge.b { background: #f44336; color: white; }
+  .p-badge.out { background: #555; color: #aaa; font-size: 0.6rem; }
+
+  .amb-toggle-btn { position: absolute; top: -4px; right: -4px; width: 24px; height: 24px; border-radius: 50%; background: #333; color: white; font-size: 14px; line-height: 24px; text-align: center; opacity: 0.8; transition: 0.2s; cursor: pointer; z-index: 12; border: 2px solid #1e331e; box-shadow: 0 2px 5px rgba(0,0,0,0.5); display: flex; align-items: center; justify-content: center; }
+  .player-node:hover .amb-toggle-btn, .player-node:active .amb-toggle-btn { opacity: 1; transform: scale(1.1); }
+  .amb-toggle-btn.is-out { background: var(--danger); opacity: 1; border-color: #500; }
+
+  .flying-chip { position: absolute; width: 30px; height: 30px; border-radius: 50%; background: radial-gradient(circle at 30% 30%, #fff, #ffd700, #b8860b); border: 2px dashed #b8860b; box-shadow: 0 4px 10px rgba(0,0,0,0.6); z-index: 20; pointer-events: none; display: flex; align-items: center; justify-content: center; }
+  .flying-chip::after { content: '$'; color: #5c4003; font-weight: bold; font-size: 14px; }
+
+  #ambDealerBtn { position: fixed; bottom: 30px; right: 30px; z-index: 101; padding: 12px 20px; background: rgba(33,150,243,0.9); border: none; color: #fff; border-radius: 30px; cursor: pointer; font-size: 1rem; box-shadow: 0 4px 15px rgba(0,0,0,0.5); transition: 0.2s; backdrop-filter: blur(4px); font-weight: bold; }
+  #ambDealerBtn:hover { transform: scale(1.05); background: #1976d2; }
+
+  #ambCheatBtn { position: fixed; bottom: 30px; left: 30px; z-index: 101; padding: 12px 20px; background: rgba(93, 64, 55, 0.9); border: none; color: #fff; border-radius: 30px; cursor: pointer; font-size: 1rem; box-shadow: 0 4px 15px rgba(0,0,0,0.5); transition: 0.2s; backdrop-filter: blur(4px); font-weight: bold; }
+  #ambCheatBtn:hover { transform: scale(1.05); background: #4e342e; }
+
+  #ambCamBtn { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%); z-index: 101; padding: 10px 18px; background: #2e7d32; border: none; color: #fff; border-radius: 30px; cursor: pointer; font-size: 0.95rem; box-shadow: 0 4px 15px rgba(0,0,0,0.5); transition: 0.2s; backdrop-filter: blur(4px); font-weight: bold; display: none; }
+  #ambCamBtn:hover { transform: translateX(-50%) scale(1.05); background: #1b5e20; }
+  #ambCamBtn.active { background: #c62828; }
+
+  .ambient-hint { position: fixed; top: 20px; left: 50%; transform: translateX(-50%); text-align: center; color: #fff; font-size: 0.85rem; z-index: 101; cursor: pointer; padding: 6px 12px; background: rgba(0,0,0,0.4); border-radius: 20px; backdrop-filter: blur(4px); border: 1px solid rgba(255,255,255,0.1); transition: 0.2s; }
+  .ambient-hint:hover { background: rgba(0,0,0,0.6); }
+
+  #gestureOverlay { display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 180px; height: 180px; border-radius: 50%; border: 3px dashed rgba(255,255,255,0.3); z-index: 105; pointer-events: none; animation: pulse-border 2s infinite; }
+  #gestureOverlay.active { display: block; }
+  #gestureOverlay.detected { border-color: var(--accent); background: rgba(76, 175, 80, 0.15); }
+  @keyframes pulse-border { 0%, 100% { transform: translate(-50%, -50%) scale(1); opacity: 0.7; } 50% { transform: translate(-50%, -50%) scale(1.05); opacity: 1; } }
+
+  #gestureStatus { position: fixed; bottom: 90px; left: 50%; transform: translateX(-50%); background: rgba(0,0,0,0.7); color: #fff; padding: 8px 16px; border-radius: 20px; font-size: 0.9rem; z-index: 102; backdrop-filter: blur(4px); white-space: nowrap; display: none; border: 1px solid rgba(255,255,255,0.1); text-align: center; max-width: 90%; }
+  #gestureStatus.active { display: block; }
+
+  .cheatsheet-overlay { display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(10, 20, 10, 0.95); z-index: 200; align-items: center; justify-content: center; backdrop-filter: blur(8px); animation: fadeIn 0.3s ease; }
+  .cheatsheet-overlay.active { display: flex; }
+  .cheatsheet-content { background: #1e331e; border: 2px solid #4caf50; border-radius: 16px; padding: 20px; width: 90%; max-width: 500px; max-height: 85vh; overflow-y: auto; box-shadow: 0 0 30px rgba(76, 175, 80, 0.2); text-align: center; }
+  .cheatsheet-content h2 { color: var(--accent); margin-bottom: 20px; font-size: 1.5rem; border-bottom: 1px solid #3a5a3a; padding-bottom: 10px; }
+  .hand-row { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid rgba(255,255,255,0.1); }
+  .hand-row:last-child { border-bottom: none; }
+  .hand-rank { font-weight: 800; color: #fff; font-size: 1.1rem; width: 120px; text-align: left; }
+  .hand-desc { color: #ccc; font-size: 0.95rem; text-align: right; flex: 1; padding-left: 10px; }
+  .close-cheat { margin-top: 20px; background: var(--danger); color: white; border: none; padding: 10px 30px; border-radius: 8px; font-size: 1rem; cursor: pointer; }
+
+  @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+  @media (max-width: 540px) {
+    .blinds { font-size: 2.8rem; } .timer { font-size: 4rem; }
+    .center-info .blinds { font-size: 3.5rem; } .center-info .timer { font-size: 4.5rem; }
+    .center-info .next-blinds { font-size: 1.2rem; }
+    .player-node { width: 72px; height: 72px; } .p-name { font-size: 0.75rem; }
+    .table-surface { width: min(85vw, 55vh); height: min(55vw, 35vh); }
+    #ambDealerBtn { bottom: 80px; right: 20px; padding: 10px 16px; font-size: 0.9rem; }
+    #ambCheatBtn { bottom: 80px; left: 20px; padding: 10px 16px; font-size: 0.9rem; }
+    #ambCamBtn { bottom: 140px; padding: 8px 14px; font-size: 0.85rem; }
+    .ambient-hint { top: 15px; }
+    .hand-rank { font-size: 1rem; width: 100px; } .hand-desc { font-size: 0.85rem; }
+    #gestureOverlay { width: 150px; height: 150px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="ambient-hint" id="ambientHint">✕ Выход</div>
+<button id="ambDealerBtn">🔄 Дилер</button>
+<button id="ambCheatBtn">📋 Комбинации</button>
+<button id="ambCamBtn">📷 Жест</button>
+
+<h1>♠ Покерный таймер ♥</h1>
+
+<div class="controls">
+  <div class="row">
+    <label>Минуты: <input type="number" id="duration" value="10" min="1" max="60"></label>
+    <label>Рост:
+      <select id="progression">
+        <option value="custom" selected>Фикс.</option>
+        <option value="double">×2 (Стандарт)</option>
+        <option value="linear">+50%</option>
+      </select>
+    </label>
+    <button class="btn-ambient" id="ambientBtn" title="На весь экран">🌙</button>
+  </div>
+  <div class="row">
+    <button class="btn-start" id="startBtn">Старт</button>
+    <button class="btn-pause" id="pauseBtn" disabled>Пауза</button>
+    <button class="btn-reset" id="resetBtn">Сброс</button>
+    <button class="btn-next" id="nextBtn">Уровень ↑</button>
+    <button class="btn-dealer" id="nextHandBtn">🃏 Раздача</button>
+    <button class="btn-reactive" id="reviveAllBtn" title="Вернуть всех в игру">♻️ Все в игре</button>
+  </div>
+</div>
+
+<div class="players-section">
+  <div class="players-header">
+    <strong>👥 Игроки (<span id="playerCount">0</span>)</strong>
+    <button class="btn-dealer" id="nextDealerBtn">🔄 Дилер</button>
+  </div>
+  <div class="player-input">
+    <input type="text" id="playerName" placeholder="Имя игрока" maxlength="15">
+    <button class="btn-start" id="addPlayerBtn">+</button>
+  </div>
+  <div class="players-list" id="playersList"></div>
+</div>
+
+<div class="display">
+  <div class="level">Блайнд <span id="levelNum">1</span></div>
+  <div class="blinds"><span id="sb">1</span> / <span id="bb">2</span></div>
+  <div class="timer" id="timer">10:00</div>
+  <div class="next-level" id="nextLevel">Далее: <span>2 / 4</span></div>
+  <div class="status" id="status">Готов к игре</div>
+</div>
+
+<div id="ambientTable">
+  <div class="table-surface">
+    <div class="felt-texture"></div>
+    <div class="center-info">
+      <div class="level">Блайнд <span id="ambLevel">1</span></div>
+      <div class="blinds"><span id="ambSb">1</span> / <span id="ambBb">2</span></div>
+      <div class="timer" id="ambTimer">10:00</div>
+      <div class="next-blinds" id="ambNextBlinds">Далее: <span>2 / 4</span></div>
+    </div>
+    <div id="gestureOverlay"></div>
+  </div>
+  <div id="gestureStatus">✋ Покажите 5 пальцев</div>
+</div>
+
+<div class="cheatsheet-overlay" id="cheatOverlay">
+  <div class="cheatsheet-content">
+    <h2>Покерные комбинации</h2>
+    <div class="hand-row"><span class="hand-rank">Роял Флеш</span><span class="hand-desc">A-K-Q-J-10 одной масти</span></div>
+    <div class="hand-row"><span class="hand-rank">Стрит Флеш</span><span class="hand-desc">5 карт подряд одной масти</span></div>
+    <div class="hand-row"><span class="hand-rank">Каре</span><span class="hand-desc">4 одинаковые карты</span></div>
+    <div class="hand-row"><span class="hand-rank">Фулл Хаус</span><span class="hand-desc">Тройка + Пара</span></div>
+    <div class="hand-row"><span class="hand-rank">Флеш</span><span class="hand-desc">5 карт одной масти</span></div>
+    <div class="hand-row"><span class="hand-rank">Стрит</span><span class="hand-desc">5 карт по порядку</span></div>
+    <div class="hand-row"><span class="hand-rank">Тройка</span><span class="hand-desc">3 одинаковые карты</span></div>
+    <div class="hand-row"><span class="hand-rank">Две Пары</span><span class="hand-desc">2 разные пары</span></div>
+    <div class="hand-row"><span class="hand-rank">Пара</span><span class="hand-desc">2 одинаковые карты</span></div>
+    <div class="hand-row"><span class="hand-rank">Старшая</span><span class="hand-desc">Высокая карта (нет совпадений)</span></div>
+    <button class="close-cheat" id="closeCheatBtn">Закрыть</button>
+  </div>
+</div>
+
+<!-- Исправленный video тег с playsinline для iOS -->
+<video id="camVideo" autoplay playsinline muted style="display:none; position:fixed; top:10px; right:10px; width:120px; border-radius:8px; opacity:0.7; z-index:99; border:2px solid #333;"></video>
+
+<script>
+let levelIndex = 0, timeLeft = 10 * 60, timerInterval = null;
+let isRunning = false, isPaused = false, audioCtx = null, wakeLock = null;
+let warn60 = false, warn30 = false;
+let players = [], dealerIndex = 0;
+let deleteConfirmId = null;
+
+let gestureSettings = { holdTime: 5000, cooldown: 8000 };
+let gestureState = { active: false, holding: 0, lastTrigger: 0, mpReady: false, stream: null, running: false };
+
+const $ = id => document.getElementById(id);
+
+function loadGestureSettings() {
+  const s = localStorage.getItem('gestureSettings_v2');
+  if(s) Object.assign(gestureSettings, JSON.parse(s));
+}
+function saveGestureSettings() {
+  localStorage.setItem('gestureSettings_v2', JSON.stringify(gestureSettings));
+}
+
+const fixedStructure = [
+  { sb: 1, bb: 2 }, { sb: 2, bb: 4 }, { sb: 3, bb: 6 }, { sb: 4, bb: 8 }, { sb: 5, bb: 10 },
+  { sb: 10, bb: 20 }, { sb: 15, bb: 30 }, { sb: 20, bb: 40 }, { sb: 25, bb: 50 },
+  { sb: 30, bb: 60 }, { sb: 40, bb: 80 }, { sb: 50, bb: 100 }, { sb: 60, bb: 120 },
+  { sb: 80, bb: 160 }, { sb: 100, bb: 200 }, { sb: 150, bb: 300 }, { sb: 200, bb: 400 },
+  { sb: 300, bb: 600 }, { sb: 400, bb: 800 }, { sb: 500, bb: 1000 }
+];
+let structure = [...fixedStructure];
+
+// === ИСПРАВЛЕННАЯ ЛОГИКА ДИЛЕРА ===
+function getActiveIndices() {
+  return players.map((p, i) => p.active ? i : -1).filter(i => i !== -1);
+}
+
+function getPositions() {
+  const active = getActiveIndices();
+  if (active.length < 2) return { dealer: -1, sb: -1, bb: -1 };
+  let pos = active.indexOf(dealerIndex);
+  if (pos === -1) pos = 0;
+  const n = active.length;
+  return {
+    dealer: active[pos],
+    sb: active[(pos + 1) % n],
+    bb: active[(pos + 2) % n]
+  };
+}
+
+function changeDealer(silent = false) {
+  const active = getActiveIndices();
+  if (active.length < 2) return;
+  const currentPos = active.indexOf(dealerIndex);
+  const nextPos = (currentPos === -1 ? 0 : currentPos + 1) % active.length;
+  dealerIndex = active[nextPos];
+
+  renderPlayers();
+  renderAmbientTable();
+
+  if (!silent) {
+    playDealerSound();
+    requestAnimationFrame(() => {
+      const pos = getPositions();
+      dealChips(pos.sb, pos.bb);
+    });
+  }
+}
+
+// === MediaPipe Инициализация (Мобильно-совместимая) ===
+let hands = null;
+let videoLoopId = null;
+
+function showGestureError(msg) {
+  $('gestureStatus').textContent = msg;
+  $('gestureStatus').classList.add('active');
+  $('gestureOverlay').classList.remove('active');
+}
+
+function initMediaPipe() {
+  if(typeof Hands === 'undefined') {
+    showGestureError('❌ Не удалось загрузить ML-модель. Проверьте интернет и перезагрузите.');
+    return false;
+  }
+
+  // Проверка HTTPS (обязательно для мобильных)
+  if (!window.isSecureContext && location.hostname !== 'localhost') {
+    showGestureError('🔒 Камера требует HTTPS или localhost. Откройте сайт по защищённой ссылке.');
+    return false;
+  }
+
+  hands = new Hands({locateFile: (file) => `https://cdn.jsdelivr.net/npm/@mediapipe/hands/${file}`});
+  hands.setOptions({ maxNumHands: 1, modelComplexity: 1, minDetectionConfidence: 0.6, minTrackingConfidence: 0.5 });
+
+  hands.onResults(results => {
+    if (results.multiHandLandmarks && results.multiHandLandmarks.length > 0) {
+      const lm = results.multiHandLandmarks[0];
+      const fingersOpen = [
+        lm[8].y < lm[6].y, lm[12].y < lm[10].y, lm[16].y < lm[14].y, lm[20].y < lm[18].y
+      ];
+      const thumbOpen = Math.abs(lm[4].x - lm[0].x) > Math.abs(lm[3].x - lm[0].x);
+      const isOpen = fingersOpen.every(Boolean) && thumbOpen;
+
+      if (isOpen) {
+        gestureState.holding += 100;
+        $('gestureOverlay').classList.add('detected');
+        $('gestureStatus').textContent = `✋ Удержание... ${(gestureState.holding/1000).toFixed(1)}s`;
+
+        if (gestureState.holding >= gestureSettings.holdTime && (Date.now() - gestureState.lastTrigger >= gestureSettings.cooldown)) {
+          triggerGestureDealer();
+        }
+      } else {
+        gestureState.holding = Math.max(0, gestureState.holding - 300);
+        $('gestureOverlay').classList.remove('detected');
+        $('gestureStatus').textContent = gestureState.holding > 200 ? '✋ Почти...' : '✋ Покажите 5 пальцев';
+      }
+    } else {
+      gestureState.holding = Math.max(0, gestureState.holding - 300);
+      $('gestureOverlay').classList.remove('detected');
+      $('gestureStatus').textContent = '✋ Покажите 5 пальцев';
+    }
+  });
+  gestureState.mpReady = true;
+  return true;
+}
+
+async function startCamera() {
+  try {
+    const stream = await navigator.mediaDevices.getUserMedia({
+      video: { facingMode: 'environment', width: { ideal: 640 }, height: { ideal: 480 } }
+    });
+
+    const video = $('camVideo');
+    video.srcObject = stream;
+    video.setAttribute('playsinline', true);
+    video.setAttribute('muted', true);
+    await video.play();
+
+    gestureState.stream = stream;
+    gestureState.running = true;
+    gestureState.holding = 0;
+
+    // Ручной цикл кадров (стабильнее на iOS, чем MediaPipe Camera utils)
+    const sendFrame = async () => {
+      if (!gestureState.running || !hands || !video.videoWidth) {
+        videoLoopId = requestAnimationFrame(sendFrame);
+        return;
+      }
+      try {
+        await hands.send({image: video});
+      } catch(e) {
+        // Игнорируем ошибки во время переключения фокуса
+      }
+      videoLoopId = requestAnimationFrame(sendFrame);
+    };
+    videoLoopId = requestAnimationFrame(sendFrame);
+
+    return true;
+  } catch(err) {
+    console.error('Camera error:', err);
+    if (err.name === 'NotAllowedError') {
+      showGestureError('🔒 Разрешите доступ к камере в настройках браузера. Требуется HTTPS.');
+    } else {
+      showGestureError(`⚠️ Ошибка камеры: ${err.message}`);
+    }
+    return false;
+  }
+}
+
+function stopCamera() {
+  gestureState.running = false;
+  if (videoLoopId) cancelAnimationFrame(videoLoopId);
+  if (gestureState.stream) {
+    gestureState.stream.getTracks().forEach(t => t.stop());
+    gestureState.stream = null;
+  }
+  $('camVideo').srcObject = null;
+}
+
+function triggerGestureDealer() {
+  gestureState.lastTrigger = Date.now();
+  gestureState.holding = 0;
+
+  changeDealer(true);
+  const pos = getPositions();
+
+  playDealerSound();
+  dealChips(pos.sb, pos.bb);
+
+  const nextName = players[pos.dealer]?.name || `P${pos.dealer+1}`;
+  $('gestureStatus').textContent = `✅ Дилер → ${nextName}`;
+  $('gestureOverlay').classList.remove('detected');
+}
+
+function toggleCamera() {
+  if (!gestureState.mpReady) {
+    if(!initMediaPipe()) return;
+  }
+
+  if (!gestureState.running) {
+    $('ambCamBtn').classList.add('active');
+    $('ambCamBtn').textContent = '⏹ Стоп';
+    $('gestureOverlay').classList.add('active');
+    $('gestureStatus').classList.add('active');
+    $('gestureStatus').textContent = '⏳ Запуск камеры...';
+    startCamera();
+  } else {
+    stopCamera();
+    $('ambCamBtn').classList.remove('active');
+    $('ambCamBtn').textContent = '📷 Жест';
+    $('gestureOverlay').classList.remove('active');
+    $('gestureStatus').classList.remove('active');
+  }
+}
+
+$('ambCamBtn').onclick = toggleCamera;
+
+// === Остальной код ===
+function initAudio() { if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)(); if (audioCtx.state === 'suspended') audioCtx.resume(); }
+function playDealerSound() { try { initAudio(); const now = audioCtx.currentTime; [880, 1100].forEach((freq, i) => { const o = audioCtx.createOscillator(), g = audioCtx.createGain(); o.type = 'sine'; o.frequency.value = freq; o.connect(g); g.connect(audioCtx.destination); const t = now + i * 0.08; o.start(t); o.stop(t + 0.1); g.gain.setValueAtTime(0, t); g.gain.linearRampToValueAtTime(0.3, t + 0.02); g.gain.exponentialRampToValueAtTime(0.01, t + 0.1); }); if(navigator.vibrate) navigator.vibrate(30); } catch(e){} }
+function playLevelUpSound() { try { initAudio(); const now = audioCtx.currentTime; const o = audioCtx.createOscillator(), g = audioCtx.createGain(); o.type = 'triangle'; o.frequency.setValueAtTime(440, now); o.frequency.linearRampToValueAtTime(880, now + 0.3); o.connect(g); g.connect(audioCtx.destination); o.start(now); o.stop(now + 0.3); g.gain.setValueAtTime(0.5, now); g.gain.linearRampToValueAtTime(0, now + 0.3); if(navigator.vibrate) navigator.vibrate([100, 50, 100]); } catch(e){} }
+function playWarning() { try { initAudio(); const now = audioCtx.currentTime; const o = audioCtx.createOscillator(), g = audioCtx.createGain(); o.type = 'square'; o.frequency.value = 880; o.connect(g); g.connect(audioCtx.destination); o.start(now); o.stop(now + 0.1); g.gain.setValueAtTime(0.2, now); g.gain.exponentialRampToValueAtTime(0.01, now + 0.1); if(navigator.vibrate) navigator.vibrate(50); } catch(e){} }
+async function requestWakeLock() { try { if('wakeLock' in navigator) { wakeLock = await navigator.wakeLock.request('screen'); wakeLock.addEventListener('release', ()=>wakeLock=null); } } catch(e){} }
+function releaseWakeLock() { if(wakeLock) { wakeLock.release(); wakeLock=null; } }
+document.addEventListener('visibilitychange', ()=>{ if(document.visibilityState==='visible' && isRunning) requestWakeLock(); });
+
+function generateStructure() { const type = $('progression').value; if (type === 'custom') { structure = [...fixedStructure]; return; } structure = [{ sb: 1, bb: 2 }]; for (let i = 1; i < 20; i++) { let prev = structure[i-1]; if (type === 'double') structure.push({ sb: prev.bb, bb: prev.bb * 2 }); else { const nextBb = Math.ceil(prev.bb * 1.5); structure.push({ sb: Math.ceil(nextBb*0.5), bb: nextBb }); } } }
+function formatTime(sec) { const m = Math.floor(sec/60).toString().padStart(2,'0'); const s = (sec%60).toString().padStart(2,'0'); return `${m}:${s}`; }
+
+function togglePlayerStatus(index) {
+  const wasActive = players[index].active;
+  const posBefore = getPositions();
+  players[index].active = !players[index].active;
+  if (wasActive && !players[index].active) {
+      if (index === posBefore.dealer || index === posBefore.sb || index === posBefore.bb) changeDealer(true);
+  }
+  renderPlayers();
+  renderAmbientTable();
+  saveSettings();
+}
+
+function initiateDelete(index) {
+  if (deleteConfirmId === index) {
+      players.splice(index, 1);
+      if (players.length === 0) dealerIndex = 0;
+      else if (dealerIndex >= players.length) dealerIndex = 0;
+      deleteConfirmId = null; renderPlayers(); saveSettings();
+  } else { deleteConfirmId = index; renderPlayers(); }
+}
+function cancelDelete() { deleteConfirmId = null; renderPlayers(); }
+function reviveAll() { players.forEach(p => p.active = true); renderPlayers(); saveSettings(); }
+$('reviveAllBtn').onclick = reviveAll;
+
+function renderPlayers() { const list = $('playersList'); const pos = getPositions(); const activeCount = getActiveIndices().length; $('playerCount').textContent = `${activeCount} / ${players.length}`; list.innerHTML = ''; if (players.length === 0) { list.innerHTML = '<div style="opacity:0.5; text-align:center; padding:15px; width:100%;">Нет игроков</div>'; return; } players.forEach((p, i) => { const item = document.createElement('div'); item.className = 'player-item'; if (!p.active) item.classList.add('out'); if (i === pos.dealer && p.active) item.classList.add('dealer'); if (i === pos.sb && p.active) item.classList.add('sb'); if (i === pos.bb && p.active) item.classList.add('bb'); let badges = ''; if (i === pos.dealer && p.active) badges += '<span class="player-badge badge-dealer">D</span>'; if (i === pos.sb && p.active) badges += '<span class="player-badge badge-sb">SB</span>'; if (i === pos.bb && p.active) badges += '<span class="player-badge badge-bb">BB</span>'; if (!p.active) badges += '<span class="player-badge" style="background:#555; color:#aaa;">OUT</span>'; const statusBtn = document.createElement('button'); statusBtn.className = `btn-status ${p.active ? 'active' : 'out'}`; statusBtn.textContent = p.active ? '😎' : '😴'; statusBtn.title = p.active ? 'Отметить выбывшим' : 'Вернуть в игру'; statusBtn.onclick = (e) => { e.stopPropagation(); togglePlayerStatus(i); }; item.innerHTML = `<div class="player-name">${p.name || `P${i+1}`}</div>${badges}`; item.prepend(statusBtn); if (players.length > 1) { const btn = document.createElement('button'); btn.className = 'btn-remove'; if (deleteConfirmId === i) { btn.classList.add('confirm-mode'); btn.textContent = '?'; btn.title = 'Нажмите еще раз для удаления'; } else { btn.textContent = '✕'; btn.title = 'Удалить из списка'; } btn.onclick = (e) => { e.stopPropagation(); initiateDelete(i); }; item.appendChild(btn); } item.onclick = () => { if(deleteConfirmId !== null) cancelDelete(); }; list.appendChild(item); }); }
+
+function addPlayer(name) { const trimmed = (name || '').trim(); if (!trimmed) return; players.push({ name: trimmed, id: Date.now(), active: true }); if (players.length === 1) dealerIndex = 0; deleteConfirmId = null; renderPlayers(); saveSettings(); $('playerName').value = ''; $('playerName').focus(); }
+$('addPlayerBtn').onclick = () => addPlayer($('playerName').value);
+$('playerName').onkeypress = (e) => { if(e.key==='Enter') addPlayer($('playerName').value); };
+
+$('ambCheatBtn').onclick = () => $('cheatOverlay').classList.add('active');
+$('closeCheatBtn').onclick = () => $('cheatOverlay').classList.remove('active');
+$('nextDealerBtn').onclick = () => changeDealer(false);
+$('ambDealerBtn').onclick = () => changeDealer(false);
+$('nextHandBtn').onclick = () => changeDealer(false);
+
+function dealChips(sbIdx, bbIdx) { if (!document.body.classList.contains('ambient')) return; const table = $('ambientTable'); const cx = window.innerWidth / 2; const cy = window.innerHeight / 2; [sbIdx, bbIdx].forEach(idx => { const node = table.querySelector(`.player-node[data-i="${idx}"]`); if (!node) return; const nodeRect = node.getBoundingClientRect(); const targetX = nodeRect.left + nodeRect.width/2; const targetY = nodeRect.top + nodeRect.height/2; const chip = document.createElement('div'); chip.className = 'flying-chip'; chip.style.left = `${cx}px`; chip.style.top = `${cy}px`; table.appendChild(chip); const anim = chip.animate([ { transform: 'translate(-50%, -50%) scale(0.5)', opacity: 0 }, { transform: 'translate(-50%, -50%) scale(1)', opacity: 1, offset: 0.2 }, { transform: `translate(calc(-50% + ${targetX - cx}px), calc(-50% + ${targetY - cy}px)) scale(1)`, opacity: 1, offset: 0.7 }, { transform: `translate(calc(-50% + ${targetX - cx}px), calc(-50% + ${targetY - cy}px)) scale(0.5)`, opacity: 0 } ], { duration: 700, easing: 'ease-in-out' }); anim.onfinish = () => chip.remove(); }); }
+
+function renderAmbientTable() { const table = $('ambientTable'); Array.from(table.querySelectorAll('.player-node')).forEach(el => el.remove()); if (players.length < 1) return; const pos = getPositions(); const count = players.length; const radiusX = 42; const radiusY = 34; players.forEach((p, i) => { const angleDeg = (360 / count) * i - 90; const angleRad = angleDeg * Math.PI / 180; const x = 50 + radiusX * Math.cos(angleRad); const y = 50 + radiusY * Math.sin(angleRad); const node = document.createElement('div'); node.className = 'player-node'; node.dataset.i = i; if (!p.active) node.classList.add('out'); if (i === pos.dealer && p.active) node.classList.add('dealer'); if (i === pos.sb && p.active) node.classList.add('sb'); if (i === pos.bb && p.active) node.classList.add('bb'); let badgeHtml = ''; if (!p.active) badgeHtml = `<div class="p-badge out">OUT</div>`; else if (i === pos.dealer) badgeHtml = `<div class="p-badge d">D</div>`; else if (i === pos.sb) badgeHtml = `<div class="p-badge s">SB</div>`; else if (i === pos.bb) badgeHtml = `<div class="p-badge b">BB</div>`; const name = p.name || `P${i+1}`; const toggleBtn = document.createElement('div'); toggleBtn.className = `amb-toggle-btn ${!p.active ? 'is-out' : ''}`; toggleBtn.innerHTML = !p.active ? '😴' : '😎'; toggleBtn.title = !p.active ? 'Вернуть в игру' : 'Отметить выбывшим'; toggleBtn.onclick = (e) => { e.stopPropagation(); togglePlayerStatus(i); }; node.innerHTML = `<div class="p-name">${name}</div>${badgeHtml}`; node.appendChild(toggleBtn); node.onclick = (e) => { if (e.target === toggleBtn || toggleBtn.contains(e.target)) return; if (p.active && dealerIndex !== i) { dealerIndex = i; renderPlayers(); renderAmbientTable(); playDealerSound(); requestAnimationFrame(() => dealChips(getPositions().sb, getPositions().bb)); } }; node.style.left = `${x}%`; node.style.top = `${y}%`; table.appendChild(node); }); $('ambCamBtn').style.display = 'block'; }
+
+function updateUI() { const lvl = structure[levelIndex] || structure[structure.length-1]; $('levelNum').textContent = levelIndex + 1; $('sb').textContent = lvl.sb; $('bb').textContent = lvl.bb; $('timer').textContent = formatTime(timeLeft); $('ambLevel').textContent = levelIndex + 1; $('ambSb').textContent = lvl.sb; $('ambBb').textContent = lvl.bb; $('ambTimer').textContent = formatTime(timeLeft); const nextEl = $('nextLevel'); const ambNextEl = $('ambNextBlinds'); let nextHtml = ''; if (levelIndex + 1 < structure.length) { const next = structure[levelIndex+1]; nextHtml = `Далее: <span>${next.sb} / ${next.bb}</span>`; } else { nextHtml = '🏆 <span>Финал</span>'; } nextEl.innerHTML = nextHtml; ambNextEl.innerHTML = nextHtml; const timerEl = $('timer'), ambTimerEl = $('ambTimer'); const isWarn = timeLeft <= 60 && timeLeft > 10; const isDanger = timeLeft <= 10; timerEl.classList.toggle('warning', isWarn); timerEl.classList.toggle('danger', isDanger); ambTimerEl.classList.toggle('warning', isWarn); ambTimerEl.classList.toggle('danger', isDanger); if (isRunning) $('status').textContent = '⏱ Игра идет...'; else if (isPaused) $('status').textContent = '⏸ Пауза'; else $('status').textContent = players.length ? '🟢 Готов к старту' : '➕ Добавьте игроков'; }
+
+function advanceLevel(isAuto = false) { levelIndex++; warn60 = false; warn30 = false; if (levelIndex >= structure.length) { clearInterval(timerInterval); isRunning = false; releaseWakeLock(); $('status').textContent = '🏆 Турнир окончен!'; $('timer').classList.remove('warning','danger'); $('ambTimer').classList.remove('warning','danger'); playLevelUpSound(); updateUI(); return; } timeLeft = parseInt($('duration').value) * 60; playLevelUpSound(); updateUI(); const pos = getPositions(); dealChips(pos.sb, pos.bb); if (!isAuto) { clearInterval(timerInterval); isRunning = false; isPaused = true; releaseWakeLock(); $('startBtn').disabled = false; $('pauseBtn').disabled = true; $('startBtn').textContent = 'Продолжить'; } }
+function tick() { if (timeLeft > 0) { timeLeft--; if (timeLeft === 60 && !warn60) { warn60 = true; playWarning(); } if (timeLeft === 30 && !warn30) { warn30 = true; playWarning(); } updateUI(); } else { advanceLevel(true); } }
+
+$('startBtn').onclick = () => { initAudio(); if(isRunning) return; if(!isPaused) { levelIndex=0; timeLeft=parseInt($('duration').value)*60; warn60=false; warn30=false; generateStructure(); } isRunning=true; isPaused=false; updateUI(); requestWakeLock(); timerInterval=setInterval(tick, 1000); $('startBtn').disabled=true; $('pauseBtn').disabled=false; $('startBtn').textContent='Идет...'; };
+$('pauseBtn').onclick = () => { if(!isRunning) return; clearInterval(timerInterval); isRunning=false; isPaused=true; releaseWakeLock(); $('startBtn').disabled=false; $('pauseBtn').disabled=true; $('startBtn').textContent='Продолжить'; updateUI(); };
+$('resetBtn').onclick = () => { clearInterval(timerInterval); isRunning=false; isPaused=false; releaseWakeLock(); levelIndex=0; timeLeft=parseInt($('duration').value)*60; warn60=false; warn30=false; generateStructure(); $('startBtn').disabled=false; $('pauseBtn').disabled=true; $('startBtn').textContent='Старт'; updateUI(); };
+$('nextBtn').onclick = () => { initAudio(); advanceLevel(false); };
+
+$('ambientBtn').onclick = () => { document.body.classList.toggle('ambient'); if(document.body.classList.contains('ambient')) { requestWakeLock(); renderAmbientTable(); } else { releaseWakeLock(); $('cheatOverlay').classList.remove('active'); if(gestureState.running) stopCamera(); $('ambCamBtn').classList.remove('active'); $('ambCamBtn').textContent = '📷 Жест'; $('gestureOverlay').classList.remove('active'); $('gestureStatus').classList.remove('active'); } };
+$('ambientHint').onclick = () => { document.body.classList.remove('ambient'); releaseWakeLock(); $('cheatOverlay').classList.remove('active'); if(gestureState.running) stopCamera(); $('ambCamBtn').classList.remove('active'); $('ambCamBtn').textContent = '📷 Жест'; $('gestureOverlay').classList.remove('active'); $('gestureStatus').classList.remove('active'); };
+
+window.addEventListener('resize', () => { if(document.body.classList.contains('ambient')) renderAmbientTable(); });
+
+function saveSettings() { localStorage.setItem('pokerTimer_v14', JSON.stringify({ duration: $('duration').value, progression: $('progression').value, players: players, dealerIndex: dealerIndex })); }
+function loadSettings() { const s = localStorage.getItem('pokerTimer_v14'); if(s) { const d = JSON.parse(s); $('duration').value = d.duration || 10; $('progression').value = d.progression || 'custom'; if(d.players) { players = d.players; dealerIndex = d.dealerIndex || 0; } } }
+['duration','progression'].forEach(id => $(id).addEventListener('change', () => { saveSettings(); generateStructure(); updateUI(); }));
+
+loadSettings(); loadGestureSettings(); generateStructure(); renderPlayers(); updateUI();
+</script>
+</body>
+</html>
