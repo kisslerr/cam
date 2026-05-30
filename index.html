@@ -67,7 +67,8 @@
 
   #ambientTable { display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: radial-gradient(circle at center, #0f1a0f 0%, #050805 100%); z-index: 100; align-items: center; justify-content: center; touch-action: none; }
   body.ambient #ambientTable { display: flex; }
-  body.ambient > *:not(#ambientTable):not(#ambCheatBtn):not(#mobDealerBtn):not(#ambCamBtn):not(.ambient-hint):not(.cheatsheet-overlay):not(#gestureOverlay):not(#gestureStatus) { display: none !important; }
+  /* Разрешаем кнопкам отображаться в Ambient */
+  body.ambient > *:not(#ambientTable):not(#ambDealerBtn):not(#ambCheatBtn):not(#ambCamBtn):not(.ambient-hint):not(.cheatsheet-overlay):not(#gestureOverlay):not(#gestureStatus) { display: none !important; }
 
   .table-surface { width: min(75vw, 60vh); height: min(50vw, 40vh); border-radius: 35% / 50%; background: #1e331e; border: 8px solid #2a4a2a; position: relative; box-shadow: 0 0 80px rgba(0,0,0,0.9), inset 0 0 40px rgba(0,0,0,0.8); }
   .felt-texture { position: absolute; top:0; left:0; width:100%; height:100%; border-radius: 35% / 50%; background-image: url("data:image/svg+xml,%3Csvg width='6' height='6' viewBox='0 0 6 6' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%23000000' fill-opacity='0.1' fill-rule='evenodd'%3E%3Cpath d='M5 0h1L0 6V5zM6 5v1H5z'/%3E%3C/g%3E%3C/svg%3E"); opacity: 0.3; pointer-events: none; }
@@ -101,18 +102,52 @@
   .flying-chip { position: absolute; width: 28px; height: 28px; border-radius: 50%; background: radial-gradient(circle at 30% 30%, #fff, #ffd700, #b8860b); border: 2px dashed #b8860b; box-shadow: 0 4px 10px rgba(0,0,0,0.6); z-index: 20; pointer-events: none; display: flex; align-items: center; justify-content: center; }
   .flying-chip::after { content: '$'; color: #5c4003; font-weight: bold; font-size: 12px; }
 
-  /* МОБИЛЬНЫЕ КНОПКИ */
-  #mobDealerBtn { display: none; position: fixed; bottom: 15px; right: 15px; z-index: 101; width: 48px; height: 48px; border-radius: 50%; background: rgba(33,150,243,0.9); border: none; color: #fff; cursor: pointer; font-size: 1.2rem; box-shadow: 0 4px 15px rgba(0,0,0,0.5); transition: 0.2s; align-items: center; justify-content: center; backdrop-filter: blur(4px); }
-  #mobDealerBtn:active { transform: scale(0.9); }
+  /* КНОПКИ В AMBIENT (ВИДНЫ ВСЕГДА) */
+  #ambDealerBtn { 
+    position: fixed; bottom: 30px; right: 30px; z-index: 101; 
+    width: 50px; height: 50px; border-radius: 50%; 
+    background: rgba(33,150,243,0.9); border: none; color: #fff; 
+    cursor: pointer; font-size: 1.4rem; 
+    box-shadow: 0 4px 15px rgba(0,0,0,0.5); transition: 0.2s; 
+    backdrop-filter: blur(4px);
+    display: flex; align-items: center; justify-content: center;
+  }
+  #ambDealerBtn:hover { transform: scale(1.1); background: #1976d2; }
+  #ambDealerBtn:active { transform: scale(0.9); }
 
-  #ambCamBtn { display: none; position: fixed; bottom: 15px; left: 15px; z-index: 101; width: 48px; height: 48px; border-radius: 50%; background: rgba(46, 125, 50, 0.9); border: none; color: #fff; cursor: pointer; font-size: 1.2rem; box-shadow: 0 4px 15px rgba(0,0,0,0.5); transition: 0.2s; align-items: center; justify-content: center; backdrop-filter: blur(4px); }
-  #ambCamBtn.active { background: #c62828; }
+  #ambCamBtn { 
+    position: fixed; bottom: 30px; left: 30px; z-index: 101; 
+    width: 50px; height: 50px; border-radius: 50%; 
+    background: rgba(46, 125, 50, 0.9); border: none; color: #fff; 
+    cursor: pointer; font-size: 1.4rem; 
+    box-shadow: 0 4px 15px rgba(0,0,0,0.5); transition: 0.2s; 
+    backdrop-filter: blur(4px);
+    display: flex; align-items: center; justify-content: center;
+  }
+  #ambCamBtn:hover { transform: scale(1.1); background: #1b5e20; }
   #ambCamBtn:active { transform: scale(0.9); }
+  #ambCamBtn.active { background: #c62828; }
 
-  #ambCheatBtn { display: none; position: fixed; bottom: 75px; right: 15px; z-index: 101; padding: 8px 12px; background: rgba(93, 64, 55, 0.9); border: none; color: #fff; border-radius: 20px; cursor: pointer; font-size: 0.85rem; box-shadow: 0 4px 15px rgba(0,0,0,0.5); transition: 0.2s; backdrop-filter: blur(4px); font-weight: bold; }
+  #ambCheatBtn { 
+    position: fixed; bottom: 90px; right: 30px; z-index: 101; 
+    padding: 8px 12px; background: rgba(93, 64, 55, 0.9); 
+    border: none; color: #fff; border-radius: 20px; 
+    cursor: pointer; font-size: 0.9rem; 
+    box-shadow: 0 4px 15px rgba(0,0,0,0.5); transition: 0.2s; 
+    backdrop-filter: blur(4px); font-weight: bold;
+    display: block;
+  }
+  #ambCheatBtn:hover { transform: scale(1.05); background: #4e342e; }
 
   /* ВЫХОД В ЛЕВОМ ВЕРХНЕМ УГЛУ */
-  .ambient-hint { position: fixed; top: 15px; left: 15px; text-align: center; color: #fff; font-size: 0.8rem; z-index: 101; cursor: pointer; padding: 6px 10px; background: rgba(0,0,0,0.5); border-radius: 16px; backdrop-filter: blur(4px); border: 1px solid rgba(255,255,255,0.15); transition: 0.2s; }
+  .ambient-hint { 
+    position: fixed; top: 15px; left: 15px; 
+    text-align: center; color: #fff; font-size: 0.8rem; 
+    z-index: 101; cursor: pointer; padding: 6px 10px; 
+    background: rgba(0,0,0,0.5); border-radius: 16px; 
+    backdrop-filter: blur(4px); border: 1px solid rgba(255,255,255,0.15); 
+    transition: 0.2s; 
+  }
   .ambient-hint:hover { background: rgba(0,0,0,0.7); }
 
   #gestureOverlay { display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 150px; height: 150px; border-radius: 50%; border: 3px dashed rgba(255,255,255,0.3); z-index: 105; pointer-events: none; animation: pulse-border 2s infinite; }
@@ -120,7 +155,7 @@
   #gestureOverlay.detected { border-color: var(--accent); background: rgba(76, 175, 80, 0.15); }
   @keyframes pulse-border { 0%, 100% { transform: translate(-50%, -50%) scale(1); opacity: 0.7; } 50% { transform: translate(-50%, -50%) scale(1.05); opacity: 1; } }
 
-  #gestureStatus { position: fixed; bottom: 70px; left: 50%; transform: translateX(-50%); background: rgba(0,0,0,0.75); color: #fff; padding: 6px 14px; border-radius: 16px; font-size: 0.85rem; z-index: 102; backdrop-filter: blur(4px); white-space: nowrap; display: none; border: 1px solid rgba(255,255,255,0.1); text-align: center; max-width: 90%; }
+  #gestureStatus { position: fixed; bottom: 90px; left: 50%; transform: translateX(-50%); background: rgba(0,0,0,0.75); color: #fff; padding: 6px 14px; border-radius: 16px; font-size: 0.85rem; z-index: 102; backdrop-filter: blur(4px); white-space: nowrap; display: none; border: 1px solid rgba(255,255,255,0.1); text-align: center; max-width: 90%; }
   #gestureStatus.active { display: block; }
 
   .cheatsheet-overlay { display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(10, 20, 10, 0.95); z-index: 200; align-items: center; justify-content: center; backdrop-filter: blur(8px); animation: fadeIn 0.3s ease; }
@@ -149,20 +184,22 @@
     .table-surface { width: min(85vw, 50vh); height: min(52vw, 30vh); }
     
     #gestureOverlay { width: 120px; height: 120px; }
-    #gestureStatus { bottom: 65px; font-size: 0.8rem; }
-  }
+    #gestureStatus { bottom: 75px; font-size: 0.8rem; }
 
-  @media (min-width: 541px) {
-    #mobDealerBtn, #ambCamBtn, #ambCheatBtn { display: none !important; }
+    /* Мобильные стили кнопок */
+    #ambDealerBtn { width: 44px; height: 44px; bottom: 15px; right: 15px; font-size: 1.2rem; }
+    #ambCamBtn { width: 44px; height: 44px; bottom: 15px; left: 15px; font-size: 1.2rem; }
+    #ambCheatBtn { bottom: 70px; right: 15px; padding: 6px 10px; font-size: 0.8rem; }
+    .ambient-hint { top: 10px; left: 10px; font-size: 0.75rem; padding: 5px 8px; }
   }
 </style>
 </head>
 <body>
 
 <div class="ambient-hint" id="ambientHint">✕ Выход</div>
-<button id="mobDealerBtn" onclick="changeDealer(true)" title="Сменить дилера">🔄</button>
+<button id="ambDealerBtn" onclick="changeDealer(true)" title="Сменить дилера">🔄</button>
 <button id="ambCheatBtn" onclick="$('cheatOverlay').classList.add('active')">📋</button>
-<button id="ambCamBtn">📷</button>
+<button id="ambCamBtn" title="Включить жесты">📷</button>
 
 <h1>♠ Покерный таймер ♥</h1>
 
@@ -415,7 +452,7 @@ function renderAmbientTable() {
   if (players.length < 1) return; 
   const pos = getPositions(); const count = players.length; 
   
-  // Адаптивные радиусы: на мобильных игроки дальше от центра, чтобы не лезть на таймер
+  // Адаптивные радиусы
   const isMobile = window.innerWidth <= 540;
   const radiusX = isMobile ? 42 : 40;
   const radiusY = isMobile ? 34 : 30; 
@@ -447,9 +484,10 @@ function renderAmbientTable() {
     node.style.left = `${x}%`; node.style.top = `${y}%`; table.appendChild(node); 
   }); 
   
-  $('mobDealerBtn').style.display = isMobile ? 'flex' : 'none';
-  $('ambCamBtn').style.display = isMobile ? 'flex' : 'none';
-  $('ambCheatBtn').style.display = isMobile ? 'block' : 'none';
+  // Теперь кнопки видны ВСЕГДА в Ambient
+  $('ambDealerBtn').style.display = 'flex';
+  $('ambCamBtn').style.display = 'flex';
+  $('ambCheatBtn').style.display = 'block';
 }
 
 function updateUI() { const lvl = structure[levelIndex] || structure[structure.length-1]; $('levelNum').textContent = levelIndex + 1; $('sb').textContent = lvl.sb; $('bb').textContent = lvl.bb; $('timer').textContent = formatTime(timeLeft); $('ambLevel').textContent = levelIndex + 1; $('ambSb').textContent = lvl.sb; $('ambBb').textContent = lvl.bb; $('ambTimer').textContent = formatTime(timeLeft); const nextEl = $('nextLevel'); const ambNextEl = $('ambNextBlinds'); let nextHtml = ''; if (levelIndex + 1 < structure.length) { const next = structure[levelIndex+1]; nextHtml = `Далее: <span>${next.sb} / ${next.bb}</span>`; } else { nextHtml = '🏆 <span>Финал</span>'; } nextEl.innerHTML = nextHtml; ambNextEl.innerHTML = nextHtml; const timerEl = $('timer'), ambTimerEl = $('ambTimer'); const isWarn = timeLeft <= 60 && timeLeft > 10; const isDanger = timeLeft <= 10; timerEl.classList.toggle('warning', isWarn); timerEl.classList.toggle('danger', isDanger); ambTimerEl.classList.toggle('warning', isWarn); ambTimerEl.classList.toggle('danger', isDanger); if (isRunning) $('status').textContent = '⏱ Игра идет...'; else if (isPaused) $('status').textContent = '⏸ Пауза'; else $('status').textContent = players.length ? '🟢 Готов к старту' : '➕ Добавьте игроков'; }
@@ -462,8 +500,8 @@ $('pauseBtn').onclick = () => { if(!isRunning) return; clearInterval(timerInterv
 $('resetBtn').onclick = () => { clearInterval(timerInterval); isRunning=false; isPaused=false; releaseWakeLock(); levelIndex=0; timeLeft=parseInt($('duration').value)*60; warn60=false; warn30=false; generateStructure(); $('startBtn').disabled=false; $('pauseBtn').disabled=true; $('startBtn').textContent='Старт'; updateUI(); };
 $('nextBtn').onclick = () => { initAudio(); advanceLevel(false); };
 
-$('ambientBtn').onclick = () => { document.body.classList.toggle('ambient'); if(document.body.classList.contains('ambient')) { requestWakeLock(); renderAmbientTable(); } else { releaseWakeLock(); $('cheatOverlay').classList.remove('active'); if(gestureState.running) stopCamera(); $('ambCamBtn').classList.remove('active'); $('gestureOverlay').classList.remove('active'); $('gestureStatus').classList.remove('active'); $('mobDealerBtn').style.display = 'none'; $('ambCheatBtn').style.display = 'none'; } };
-$('ambientHint').onclick = () => { document.body.classList.remove('ambient'); releaseWakeLock(); $('cheatOverlay').classList.remove('active'); if(gestureState.running) stopCamera(); $('ambCamBtn').classList.remove('active'); $('gestureOverlay').classList.remove('active'); $('gestureStatus').classList.remove('active'); $('mobDealerBtn').style.display = 'none'; $('ambCheatBtn').style.display = 'none'; };
+$('ambientBtn').onclick = () => { document.body.classList.toggle('ambient'); if(document.body.classList.contains('ambient')) { requestWakeLock(); renderAmbientTable(); } else { releaseWakeLock(); $('cheatOverlay').classList.remove('active'); if(gestureState.running) stopCamera(); $('ambCamBtn').classList.remove('active'); $('gestureOverlay').classList.remove('active'); $('gestureStatus').classList.remove('active'); /* Скрываем кнопки при выходе */ $('ambDealerBtn').style.display = 'none'; $('ambCamBtn').style.display = 'none'; $('ambCheatBtn').style.display = 'none'; } };
+$('ambientHint').onclick = () => { document.body.classList.remove('ambient'); releaseWakeLock(); $('cheatOverlay').classList.remove('active'); if(gestureState.running) stopCamera(); $('ambCamBtn').classList.remove('active'); $('gestureOverlay').classList.remove('active'); $('gestureStatus').classList.remove('active'); $('ambDealerBtn').style.display = 'none'; $('ambCamBtn').style.display = 'none'; $('ambCheatBtn').style.display = 'none'; };
 
 window.addEventListener('resize', () => { if(document.body.classList.contains('ambient')) renderAmbientTable(); });
 
