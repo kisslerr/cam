@@ -7,7 +7,7 @@
 <!-- MediaPipe -->
 <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js" crossorigin="anonymous"></script>
 <script src="https://cdn.jsdelivr.net/npm/@mediapipe/hands/hands.js" crossorigin="anonymous"></script>
-<!-- Firebase (Compat version for direct usage) -->
+<!-- Firebase (Compat version) -->
 <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
 <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
 
@@ -74,19 +74,22 @@
   body.ambient #ambientTable { display: flex; }
   body.ambient > *:not(#ambientTable):not(#ambDealerBtn):not(#ambCheatBtn):not(#ambCamBtn):not(#ambResetBtn):not(.ambient-hint):not(.cheatsheet-overlay):not(#gestureOverlay):not(#gestureStatus) { display: none !important; }
 
-  .table-surface { width: min(80vw, 65vh); height: min(55vw, 42vh); border-radius: 35% / 50%; background: #1e331e; border: 8px solid #2a4a2a; position: relative; box-shadow: 0 0 80px rgba(0,0,0,0.9), inset 0 0 40px rgba(0,0,0,0.8); }
+  /* ОГРОМНЫЙ СТОЛ */
+  .table-surface { width: min(90vw, 80vh); height: min(60vw, 50vh); border-radius: 35% / 50%; background: #1e331e; border: 10px solid #2a4a2a; position: relative; box-shadow: 0 0 100px rgba(0,0,0,0.9), inset 0 0 60px rgba(0,0,0,0.8); }
   .felt-texture { position: absolute; top:0; left:0; width:100%; height:100%; border-radius: 35% / 50%; background-image: url("data:image/svg+xml,%3Csvg width='6' height='6' viewBox='0 0 6 6' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%23000000' fill-opacity='0.1' fill-rule='evenodd'%3E%3Cpath d='M5 0h1L0 6V5zM6 5v1H5z'/%3E%3C/g%3E%3C/svg%3E"); opacity: 0.3; pointer-events: none; }
   
-  .center-info { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); text-align: center; z-index: 5; pointer-events: none; text-shadow: 0 2px 8px rgba(0,0,0,0.8); width: 90%; max-width: 420px; }
-  .center-info .level { font-size: 1rem; opacity: 0.7; margin-bottom: 4px; color: #e8f5e9; }
-  .center-info .blinds { font-size: clamp(6rem, 18vw, 12rem); font-weight: 800; margin: 5px 0; line-height: 1; white-space: nowrap; color: #ffffff; text-shadow: 0 4px 16px rgba(0,0,0,0.8); }
-  .center-info .timer { font-size: clamp(3.5rem, 10vw, 5rem); font-variant-numeric: tabular-nums; letter-spacing: 2px; font-weight: 700; margin: 4px 0; color: #e8f5e9; }
+  .center-info { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); text-align: center; z-index: 5; pointer-events: none; text-shadow: 0 2px 8px rgba(0,0,0,0.8); width: 95%; max-width: 500px; }
+  .center-info .level { font-size: 1.2rem; opacity: 0.7; margin-bottom: 4px; color: #e8f5e9; }
+  
+  /* ОЧЕНЬ КРУПНЫЕ ЦИФРЫ */
+  .center-info .blinds { font-size: clamp(8rem, 25vw, 16rem); font-weight: 800; margin: 5px 0; line-height: 1; white-space: nowrap; color: #ffffff; text-shadow: 0 4px 20px rgba(0,0,0,0.9); }
+  .center-info .timer { font-size: clamp(5rem, 15vw, 8rem); font-variant-numeric: tabular-nums; letter-spacing: 2px; font-weight: 700; margin: 4px 0; color: #e8f5e9; }
   .center-info .timer.warning { color: var(--warn); }
   .center-info .timer.danger { color: var(--danger); animation: pulse 0.8s infinite; }
   
   .center-info .next-blinds { 
-    font-size: clamp(1.5rem, 4.5vw, 2.8rem); 
-    opacity: 0.9; margin-top: 8px; font-weight: 700; letter-spacing: 0.5px; white-space: nowrap; 
+    font-size: clamp(2rem, 6vw, 3.5rem); 
+    opacity: 0.9; margin-top: 10px; font-weight: 700; letter-spacing: 1px; white-space: nowrap; 
     color: #e8f5e9; transition: 0.2s; text-shadow: 0 2px 8px rgba(0,0,0,0.6);
     overflow: hidden; text-overflow: ellipsis; max-width: 100%; display: inline-block;
   }
@@ -94,51 +97,51 @@
   .center-info .next-blinds.urgent { color: var(--danger); animation: pulse-urgent 0.4s infinite alternate; transform: scale(1.05); }
   @keyframes pulse-urgent { from { opacity: 1; text-shadow: 0 0 10px rgba(244,67,54,0.4); } to { opacity: 0.4; text-shadow: 0 0 20px rgba(244,67,54,0.8); } }
 
-  .player-node { position: absolute; width: 70px; height: 70px; border-radius: 50%; background: #2a3d2a; border: 2px solid #555; display: flex; flex-direction: column; justify-content: center; align-items: center; transform: translate(-50%, -50%); transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1); box-shadow: 0 4px 12px rgba(0,0,0,0.8); color: white; font-size: 0.8rem; text-align: center; cursor: pointer; z-index: 6; user-select: none; padding: 3px; }
+  .player-node { position: absolute; width: 80px; height: 80px; border-radius: 50%; background: #2a3d2a; border: 2px solid #555; display: flex; flex-direction: column; justify-content: center; align-items: center; transform: translate(-50%, -50%); transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1); box-shadow: 0 4px 12px rgba(0,0,0,0.8); color: white; font-size: 0.8rem; text-align: center; cursor: pointer; z-index: 6; user-select: none; padding: 3px; }
   .player-node:active { transform: translate(-50%, -50%) scale(0.95); }
   .player-node.out { opacity: 0.3; filter: grayscale(1); border-color: #333; background: #1a1a1a; box-shadow: none; }
   .player-node.dealer { border-color: #2196f3; background: #1a2a3a; box-shadow: 0 0 20px rgba(33,150,243,0.5); transform: translate(-50%, -50%) scale(1.15); z-index: 7; }
   .player-node.sb { border-color: #ff9800; background: #2a2515; }
   .player-node.bb { border-color: #f44336; background: #2a1515; }
-  .p-name { font-size: 0.7rem; width: 85%; max-height: 2.4em; overflow: hidden; text-overflow: ellipsis; white-space: normal; word-break: break-word; line-height: 1.1; font-weight: 700; pointer-events: none; margin-bottom: 2px; text-shadow: 0 1px 2px rgba(0,0,0,0.8); }
-  .p-badge { font-size: 0.55rem; padding: 2px 4px; border-radius: 3px; margin-top: 2px; font-weight: bold; pointer-events: none; line-height: 1; transition: 0.3s; }
+  .p-name { font-size: 0.75rem; width: 90%; max-height: 2.4em; overflow: hidden; text-overflow: ellipsis; white-space: normal; word-break: break-word; line-height: 1.1; font-weight: 700; pointer-events: none; margin-bottom: 2px; text-shadow: 0 1px 2px rgba(0,0,0,0.8); }
+  .p-badge { font-size: 0.6rem; padding: 2px 5px; border-radius: 3px; margin-top: 2px; font-weight: bold; pointer-events: none; line-height: 1; transition: 0.3s; }
   .p-badge.d { background: #2196f3; color: white; }
   .p-badge.s { background: #ff9800; color: #000; }
   .p-badge.b { background: #f44336; color: white; }
-  .p-badge.out { background: #555; color: #aaa; font-size: 0.5rem; }
+  .p-badge.out { background: #555; color: #aaa; font-size: 0.55rem; }
 
-  .amb-toggle-btn { position: absolute; top: -3px; right: -3px; width: 20px; height: 20px; border-radius: 50%; background: #333; color: white; font-size: 11px; line-height: 20px; text-align: center; opacity: 0.8; transition: 0.2s; cursor: pointer; z-index: 12; border: 2px solid #1e331e; box-shadow: 0 2px 5px rgba(0,0,0,0.5); display: flex; align-items: center; justify-content: center; }
+  .amb-toggle-btn { position: absolute; top: -3px; right: -3px; width: 22px; height: 22px; border-radius: 50%; background: #333; color: white; font-size: 12px; line-height: 22px; text-align: center; opacity: 0.8; transition: 0.2s; cursor: pointer; z-index: 12; border: 2px solid #1e331e; box-shadow: 0 2px 5px rgba(0,0,0,0.5); display: flex; align-items: center; justify-content: center; }
   .player-node:hover .amb-toggle-btn, .player-node:active .amb-toggle-btn { opacity: 1; transform: scale(1.1); }
   .amb-toggle-btn.is-out { background: var(--danger); opacity: 1; border-color: #500; }
   
-  .flying-chip { position: absolute; width: 26px; height: 26px; border-radius: 50%; background: radial-gradient(circle at 30% 30%, #fff, #ffd700, #b8860b); border: 2px dashed #b8860b; box-shadow: 0 4px 10px rgba(0,0,0,0.6); z-index: 20; pointer-events: none; display: flex; align-items: center; justify-content: center; }
-  .flying-chip::after { content: '$'; color: #5c4003; font-weight: bold; font-size: 11px; }
+  .flying-chip { position: absolute; width: 30px; height: 30px; border-radius: 50%; background: radial-gradient(circle at 30% 30%, #fff, #ffd700, #b8860b); border: 2px dashed #b8860b; box-shadow: 0 4px 10px rgba(0,0,0,0.6); z-index: 20; pointer-events: none; display: flex; align-items: center; justify-content: center; }
+  .flying-chip::after { content: '$'; color: #5c4003; font-weight: bold; font-size: 12px; }
 
   /* AMBIENT КНОПКИ */
-  #ambDealerBtn { position: fixed; bottom: 25px; right: 25px; z-index: 101; width: 46px; height: 46px; border-radius: 50%; background: rgba(33,150,243,0.9); border: none; color: #fff; cursor: pointer; font-size: 1.3rem; box-shadow: 0 4px 15px rgba(0,0,0,0.5); transition: 0.2s; backdrop-filter: blur(4px); display: none; align-items: center; justify-content: center; }
+  #ambDealerBtn { position: fixed; bottom: 30px; right: 30px; z-index: 101; width: 50px; height: 50px; border-radius: 50%; background: rgba(33,150,243,0.9); border: none; color: #fff; cursor: pointer; font-size: 1.4rem; box-shadow: 0 4px 15px rgba(0,0,0,0.5); transition: 0.2s; backdrop-filter: blur(4px); display: none; align-items: center; justify-content: center; }
   #ambDealerBtn:hover { transform: scale(1.1); background: #1976d2; }
   #ambDealerBtn:active { transform: scale(0.9); }
 
-  #ambCamBtn { position: fixed; bottom: 25px; left: 25px; z-index: 101; width: 46px; height: 46px; border-radius: 50%; background: rgba(46, 125, 50, 0.9); border: none; color: #fff; cursor: pointer; font-size: 1.3rem; box-shadow: 0 4px 15px rgba(0,0,0,0.5); transition: 0.2s; backdrop-filter: blur(4px); display: none; align-items: center; justify-content: center; }
+  #ambCamBtn { position: fixed; bottom: 30px; left: 30px; z-index: 101; width: 50px; height: 50px; border-radius: 50%; background: rgba(46, 125, 50, 0.9); border: none; color: #fff; cursor: pointer; font-size: 1.4rem; box-shadow: 0 4px 15px rgba(0,0,0,0.5); transition: 0.2s; backdrop-filter: blur(4px); display: none; align-items: center; justify-content: center; }
   #ambCamBtn:hover { transform: scale(1.1); background: #1b5e20; }
   #ambCamBtn:active { transform: scale(0.9); }
   #ambCamBtn.active { background: #c62828; }
 
-  #ambCheatBtn { position: fixed; bottom: 80px; right: 25px; z-index: 101; padding: 6px 10px; background: rgba(93, 64, 55, 0.9); border: none; color: #fff; border-radius: 16px; cursor: pointer; font-size: 0.85rem; box-shadow: 0 4px 15px rgba(0,0,0,0.5); transition: 0.2s; backdrop-filter: blur(4px); font-weight: bold; display: none; }
+  #ambCheatBtn { position: fixed; bottom: 90px; right: 30px; z-index: 101; padding: 8px 12px; background: rgba(93, 64, 55, 0.9); border: none; color: #fff; border-radius: 16px; cursor: pointer; font-size: 0.9rem; box-shadow: 0 4px 15px rgba(0,0,0,0.5); transition: 0.2s; backdrop-filter: blur(4px); font-weight: bold; display: none; }
   #ambCheatBtn:hover { transform: scale(1.05); background: #4e342e; }
 
-  #ambResetBtn { position: fixed; top: 12px; right: 12px; z-index: 101; padding: 5px 10px; background: rgba(90, 90, 90, 0.6); border: 1px solid rgba(255,255,255,0.2); color: #fff; border-radius: 14px; cursor: pointer; font-size: 0.8rem; backdrop-filter: blur(4px); transition: 0.2s; display: none; }
-  #ambResetBtn:hover { background: rgba(244, 67, 54, 0.7); }
+  #ambResetBtn { position: fixed; top: 15px; right: 15px; z-index: 101; padding: 8px 15px; background: rgba(244, 67, 54, 0.8); border: 1px solid rgba(255,255,255,0.3); color: #fff; border-radius: 20px; cursor: pointer; font-size: 0.9rem; backdrop-filter: blur(4px); transition: 0.2s; display: none; font-weight: bold; }
+  #ambResetBtn:hover { background: #d32f2f; transform: scale(1.05); }
 
-  .ambient-hint { position: fixed; top: 12px; left: 12px; text-align: center; color: #fff; font-size: 0.75rem; z-index: 101; cursor: pointer; padding: 5px 8px; background: rgba(0,0,0,0.5); border-radius: 14px; backdrop-filter: blur(4px); border: 1px solid rgba(255,255,255,0.15); transition: 0.2s; }
-  .ambient-hint:hover { background: rgba(0,0,0,0.7); }
+  .ambient-hint { position: fixed; top: 15px; left: 15px; text-align: center; color: #fff; font-size: 0.8rem; z-index: 101; cursor: pointer; padding: 8px 12px; background: rgba(0,0,0,0.6); border-radius: 20px; backdrop-filter: blur(4px); border: 1px solid rgba(255,255,255,0.2); transition: 0.2s; }
+  .ambient-hint:hover { background: rgba(0,0,0,0.8); }
 
-  #gestureOverlay { display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 140px; height: 140px; border-radius: 50%; border: 3px dashed rgba(255,255,255,0.3); z-index: 105; pointer-events: none; animation: pulse-border 2s infinite; }
+  #gestureOverlay { display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 160px; height: 160px; border-radius: 50%; border: 3px dashed rgba(255,255,255,0.3); z-index: 105; pointer-events: none; animation: pulse-border 2s infinite; }
   #gestureOverlay.active { display: block; }
   #gestureOverlay.detected { border-color: var(--accent); background: rgba(76, 175, 80, 0.15); }
   @keyframes pulse-border { 0%, 100% { transform: translate(-50%, -50%) scale(1); opacity: 0.7; } 50% { transform: translate(-50%, -50%) scale(1.05); opacity: 1; } }
 
-  #gestureStatus { position: fixed; bottom: 80px; left: 50%; transform: translateX(-50%); background: rgba(0,0,0,0.75); color: #fff; padding: 5px 12px; border-radius: 14px; font-size: 0.8rem; z-index: 102; backdrop-filter: blur(4px); white-space: nowrap; display: none; border: 1px solid rgba(255,255,255,0.1); text-align: center; max-width: 85%; }
+  #gestureStatus { position: fixed; bottom: 90px; left: 50%; transform: translateX(-50%); background: rgba(0,0,0,0.8); color: #fff; padding: 8px 16px; border-radius: 20px; font-size: 0.9rem; z-index: 102; backdrop-filter: blur(4px); white-space: nowrap; display: none; border: 1px solid rgba(255,255,255,0.1); text-align: center; max-width: 90%; }
   #gestureStatus.active { display: block; }
 
   .cheatsheet-overlay { display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(10, 20, 10, 0.95); z-index: 200; align-items: center; justify-content: center; backdrop-filter: blur(8px); animation: fadeIn 0.3s ease; }
@@ -154,21 +157,21 @@
   @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
   @media (max-width: 540px) {
-    .center-info { max-width: 85%; }
-    .center-info .blinds { font-size: clamp(4.5rem, 16vw, 8rem); }
-    .center-info .timer { font-size: clamp(2.5rem, 8vw, 3.8rem); }
-    .center-info .next-blinds { font-size: clamp(1.2rem, 4vw, 1.8rem); }
-    .player-node { width: 56px; height: 56px; }
-    .p-name { font-size: 0.6rem; max-width: 42px; }
+    .center-info { max-width: 90%; }
+    .center-info .blinds { font-size: clamp(5rem, 18vw, 9rem); }
+    .center-info .timer { font-size: clamp(3rem, 10vw, 5rem); }
+    .center-info .next-blinds { font-size: clamp(1.2rem, 4vw, 2rem); }
+    .player-node { width: 60px; height: 60px; }
+    .p-name { font-size: 0.6rem; max-width: 45px; }
     .p-badge { font-size: 0.45rem; }
-    .table-surface { width: min(88vw, 52vh); height: min(54vw, 32vh); }
-    #gestureOverlay { width: 110px; height: 110px; }
-    #gestureStatus { bottom: 65px; font-size: 0.75rem; }
-    #ambDealerBtn { width: 40px; height: 40px; bottom: 12px; right: 12px; font-size: 1.1rem; }
-    #ambCamBtn { width: 40px; height: 40px; bottom: 12px; left: 12px; font-size: 1.1rem; }
-    #ambCheatBtn { bottom: 62px; right: 12px; padding: 5px 8px; font-size: 0.75rem; }
-    #ambResetBtn { top: 8px; right: 8px; padding: 4px 8px; font-size: 0.7rem; }
-    .ambient-hint { top: 8px; left: 8px; font-size: 0.7rem; padding: 4px 7px; }
+    .table-surface { width: min(92vw, 55vh); height: min(60vw, 35vh); }
+    #gestureOverlay { width: 120px; height: 120px; }
+    #gestureStatus { bottom: 70px; font-size: 0.8rem; }
+    #ambDealerBtn { width: 44px; height: 44px; bottom: 15px; right: 15px; font-size: 1.2rem; }
+    #ambCamBtn { width: 44px; height: 44px; bottom: 15px; left: 15px; font-size: 1.2rem; }
+    #ambCheatBtn { bottom: 70px; right: 15px; padding: 6px 10px; font-size: 0.8rem; }
+    #ambResetBtn { top: 10px; right: 10px; padding: 6px 12px; font-size: 0.8rem; }
+    .ambient-hint { top: 10px; left: 10px; font-size: 0.75rem; padding: 6px 10px; }
   }
 </style>
 </head>
@@ -272,7 +275,6 @@ let db = null;
 try {
   firebase.initializeApp(firebaseConfig);
   db = firebase.database();
-  console.log("Firebase initialized successfully");
 } catch(e) { console.error("Firebase init error:", e); }
 
 // === STATE ===
@@ -471,7 +473,10 @@ function renderAmbientTable() {
   if (players.length < 1) return; 
   const pos = getPositions(); const count = players.length; 
   const isMobile = window.innerWidth <= 540;
-  const radiusX = isMobile ? 40 : 40; const radiusY = isMobile ? 32 : 30; 
+  // Увеличили радиус для растянутого стола
+  const radiusX = isMobile ? 46 : 48; 
+  const radiusY = isMobile ? 38 : 42; 
+  
   players.forEach((p, i) => { 
     const angleDeg = (360 / count) * i - 90; const angleRad = angleDeg * Math.PI / 180;
     const x = 50 + radiusX * Math.cos(angleRad); const y = 50 + radiusY * Math.sin(angleRad);
@@ -577,7 +582,7 @@ function listenForUpdates() {
   });
 }
 
-// Event Listeners (Safe initialization)
+// Event Listeners
 document.addEventListener('DOMContentLoaded', () => {
   $('addPlayerBtn').onclick = () => addPlayer($('playerName').value);
   $('playerName').onkeypress = (e) => { if(e.key==='Enter') addPlayer($('playerName').value); };
@@ -615,12 +620,18 @@ document.addEventListener('DOMContentLoaded', () => {
   };
 
   $('nextBtn').onclick = () => { initAudio(); advanceLevel(false); };
+  
+  // Исправленная кнопка сброса в Ambient
   $('ambResetBtn').onclick = () => {
     clearInterval(timerInterval); timerInterval = null;
     isRunning=false; isPaused=false; syncIsCountingDown = false; releaseWakeLock();
-    levelIndex=0; timeLeft=parseInt($('duration').value)*60; warn60=false; warn30=false; warn3=false; generateStructure();
+    levelIndex=0; 
+    timeLeft=parseInt($('duration').value)*60; 
+    warn60=false; warn30=false; warn3=false; 
+    generateStructure();
     $('ambNextBlinds').classList.remove('urgent');
-    updateUI(); syncState();
+    updateUI(); 
+    syncState(); // Отправляем сброс всем устройствам
   };
 
   $('ambientBtn').onclick = () => { document.body.classList.toggle('ambient'); if(document.body.classList.contains('ambient')) { requestWakeLock(); renderAmbientTable(); } else { releaseWakeLock(); $('cheatOverlay').classList.remove('active'); if(gestureState.running) stopCamera(); $('ambCamBtn').classList.remove('active'); $('gestureOverlay').classList.remove('active'); $('gestureStatus').classList.remove('active'); $('ambDealerBtn').style.display = 'none'; $('ambCamBtn').style.display = 'none'; $('ambCheatBtn').style.display = 'none'; $('ambResetBtn').style.display = 'none'; } };
