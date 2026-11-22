@@ -47,7 +47,8 @@
   .timer.danger { color: var(--danger); animation: pulse 1s infinite; }
   .next-level { font-size: 0.9rem; opacity: 0.6; margin-top: 8px; min-height: 1.2em; }
   .next-level span { color: var(--accent); font-weight: 600; }
-  .status { margin-top: 15px; font-size: 0.9rem; opacity: 0.6; font-style: italic; }  @keyframes pulse { 50% { opacity: 0.6; transform: scale(0.98); } }
+  .status { margin-top: 15px; font-size: 0.9rem; opacity: 0.6; font-style: italic; }
+  @keyframes pulse { 50% { opacity: 0.6; transform: scale(0.98); } }
 
   .players-section { background: var(--panel); padding: 15px; border-radius: 12px; width: 100%; max-width: 600px; margin-bottom: 20px; }
   .players-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; flex-wrap: wrap; gap: 10px; }
@@ -96,7 +97,8 @@
   .player-node.bb { border-color: #f44336; background: #2a1515; }
   .p-name { font-size: 0.7rem; width: 85%; max-height: 2.4em; overflow: hidden; text-overflow: ellipsis; white-space: normal; word-break: break-word; line-height: 1.1; font-weight: 700; pointer-events: none; margin-bottom: 2px; text-shadow: 0 1px 2px rgba(0,0,0,0.8); }
   .p-badge { font-size: 0.55rem; padding: 2px 4px; border-radius: 3px; margin-top: 2px; font-weight: bold; pointer-events: none; line-height: 1; transition: 0.3s; }
-  .p-badge.d { background: #2196f3; color: white; }  .p-badge.s { background: #ff9800; color: #000; }
+  .p-badge.d { background: #2196f3; color: white; }
+  .p-badge.s { background: #ff9800; color: #000; }
   .p-badge.b { background: #f44336; color: white; }
   .p-badge.out { background: #555; color: #aaa; font-size: 0.5rem; }
 
@@ -120,14 +122,7 @@
   #ambCheatBtn { position: fixed; bottom: 80px; right: 25px; z-index: 101; padding: 6px 10px; background: rgba(93, 64, 55, 0.9); border: none; color: #fff; border-radius: 16px; cursor: pointer; font-size: 0.85rem; box-shadow: 0 4px 15px rgba(0,0,0,0.5); transition: 0.2s; backdrop-filter: blur(4px); font-weight: bold; display: none; }
   #ambCheatBtn:hover { transform: scale(1.05); background: #4e342e; }
 
-  /* КНОПКА СБРОСА В AMBIENT */
-  #ambResetBtn { 
-    position: fixed; top: 12px; right: 12px; z-index: 101; 
-    padding: 5px 10px; background: rgba(90, 90, 90, 0.6); 
-    border: 1px solid rgba(255,255,255,0.2); color: #fff; 
-    border-radius: 14px; cursor: pointer; font-size: 0.8rem; 
-    backdrop-filter: blur(4px); transition: 0.2s; display: none;
-  }
+  #ambResetBtn { position: fixed; top: 12px; right: 12px; z-index: 101; padding: 5px 10px; background: rgba(90, 90, 90, 0.6); border: 1px solid rgba(255,255,255,0.2); color: #fff; border-radius: 14px; cursor: pointer; font-size: 0.8rem; backdrop-filter: blur(4px); transition: 0.2s; display: none; }
   #ambResetBtn:hover { background: rgba(244, 67, 54, 0.7); }
 
   .ambient-hint { position: fixed; top: 12px; left: 12px; text-align: center; color: #fff; font-size: 0.75rem; z-index: 101; cursor: pointer; padding: 5px 8px; background: rgba(0,0,0,0.5); border-radius: 14px; backdrop-filter: blur(4px); border: 1px solid rgba(255,255,255,0.15); transition: 0.2s; }
@@ -145,7 +140,8 @@
   .cheatsheet-overlay.active { display: flex; }
   .cheatsheet-content { background: #1e331e; border: 2px solid #4caf50; border-radius: 16px; padding: 20px; width: 90%; max-width: 500px; max-height: 85vh; overflow-y: auto; box-shadow: 0 0 30px rgba(76, 175, 80, 0.2); text-align: center; }
   .cheatsheet-content h2 { color: var(--accent); margin-bottom: 20px; font-size: 1.5rem; border-bottom: 1px solid #3a5a3a; padding-bottom: 10px; }
-  .hand-row { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid rgba(255,255,255,0.1); }  .hand-row:last-child { border-bottom: none; }
+  .hand-row { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid rgba(255,255,255,0.1); }
+  .hand-row:last-child { border-bottom: none; }
   .hand-rank { font-weight: 800; color: #fff; font-size: 1.1rem; width: 120px; text-align: left; }
   .hand-desc { color: #ccc; font-size: 0.95rem; text-align: right; flex: 1; padding-left: 10px; }
   .close-cheat { margin-top: 20px; background: var(--danger); color: white; border: none; padding: 10px 30px; border-radius: 8px; font-size: 1rem; cursor: pointer; }
@@ -194,7 +190,8 @@
     <button class="btn-ambient" id="ambientBtn" title="На весь экран">🌙</button>
   </div>
   <div class="row">
-    <button class="btn-start" id="startBtn">Старт</button>    <button class="btn-pause" id="pauseBtn" disabled>Пауза</button>
+    <button class="btn-start" id="startBtn">Старт</button>
+    <button class="btn-pause" id="pauseBtn" disabled>Пауза</button>
     <button class="btn-reset" id="resetBtn">Сброс</button>
     <button class="btn-next" id="nextBtn">Уровень ↑</button>
     <button class="btn-reactive" id="reviveAllBtn" title="Вернуть всех в игру">♻️ Все в игре</button>
@@ -214,7 +211,7 @@
 </div>
 
 <div class="display">
-  <div class="level">Блайнд <span id="levelNum">1</span></div>
+  <div class="level">Блайнд <span id="levelIndexDisplay">1</span></div>
   <div class="blinds"><span id="sb">1</span> / <span id="bb">2</span></div>
   <div class="timer" id="timer">10:00</div>
   <div class="next-level" id="nextLevel">Далее: <span>2 / 4</span></div>
@@ -243,7 +240,8 @@
     <div class="hand-row"><span class="hand-rank">Каре</span><span class="hand-desc">4 одинаковые карты</span></div>
     <div class="hand-row"><span class="hand-rank">Фулл Хаус</span><span class="hand-desc">Тройка + Пара</span></div>
     <div class="hand-row"><span class="hand-rank">Флеш</span><span class="hand-desc">5 карт одной масти</span></div>
-    <div class="hand-row"><span class="hand-rank">Стрит</span><span class="hand-desc">5 карт по порядку</span></div>    <div class="hand-row"><span class="hand-rank">Тройка</span><span class="hand-desc">3 одинаковые карты</span></div>
+    <div class="hand-row"><span class="hand-rank">Стрит</span><span class="hand-desc">5 карт по порядку</span></div>
+    <div class="hand-row"><span class="hand-rank">Тройка</span><span class="hand-desc">3 одинаковые карты</span></div>
     <div class="hand-row"><span class="hand-rank">Две Пары</span><span class="hand-desc">2 разные пары</span></div>
     <div class="hand-row"><span class="hand-rank">Пара</span><span class="hand-desc">2 одинаковые карты</span></div>
     <div class="hand-row"><span class="hand-rank">Старшая</span><span class="hand-desc">Высокая карта (нет совпадений)</span></div>
@@ -292,7 +290,8 @@ function getPositions() {
   return { dealer: active[pos], sb: active[(pos + 1) % n], bb: active[(pos + 2) % n] };
 }
 
-function changeDealer(silent = false) {  const active = getActiveIndices();
+function changeDealer(silent = false) {
+  const active = getActiveIndices();
   if (active.length < 2) return;
   const currentPos = active.indexOf(dealerIndex);
   const nextPos = (currentPos === -1 ? 0 : currentPos + 1) % active.length;
@@ -306,7 +305,7 @@ let hands = null, videoLoopId = null;
 function showGestureError(msg) { $('gestureStatus').textContent = msg; $('gestureStatus').classList.add('active'); $('gestureOverlay').classList.remove('active'); }
 
 function initMediaPipe() {
-  if(typeof Hands === 'undefined') { showGestureError('❌ Библиотека AI не загрузилась. Проверьте интернет.'); return false; }
+  if(typeof Hands === 'undefined') { showGestureError('❌ Библиотека AI не загрузилась.'); return false; }
   $('gestureStatus').textContent = '⏳ Загрузка модели...';
   hands = new Hands({locateFile: (file) => `https://cdn.jsdelivr.net/npm/@mediapipe/hands/${file}`});
   hands.setOptions({ maxNumHands: 1, modelComplexity: 1, minDetectionConfidence: 0.6, minTrackingConfidence: 0.5 });
@@ -341,13 +340,12 @@ function initMediaPipe() {
   return true;
 }
 
-async function startCamera() {  $('gestureStatus').textContent = '⏳ Запуск камеры...';
+async function startCamera() {
+  $('gestureStatus').textContent = '⏳ Запуск камеры...';
   try {
     const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'user', width: { ideal: 640 }, height: { ideal: 480 } } });
     const video = $('camVideo');
-    video.srcObject = stream;
-    video.setAttribute('playsinline', true);
-    video.muted = true;
+    video.srcObject = stream; video.setAttribute('playsinline', true); video.muted = true;
     await new Promise((resolve, reject) => {
       video.onloadedmetadata = () => resolve();
       video.onerror = () => reject(new Error('Не удалось загрузить видео'));
@@ -358,7 +356,7 @@ async function startCamera() {  $('gestureStatus').textContent = '⏳ Запус
     $('gestureStatus').textContent = '✅ Камера активна';
     const sendFrame = async () => {
       if (!gestureState.running || !hands || video.readyState < 2) { if(gestureState.running) videoLoopId = requestAnimationFrame(sendFrame); return; }
-      try { await hands.send({image: video}); } catch(e) { console.warn('MP send err:', e); }
+      try { await hands.send({image: video}); } catch(e) {}
       videoLoopId = requestAnimationFrame(sendFrame);
     };
     videoLoopId = requestAnimationFrame(sendFrame);
@@ -389,8 +387,9 @@ function triggerGestureDealer() {
 }
 
 function toggleCamera() {
-  if (!window.isSecureContext && location.hostname !== 'localhost') { showGestureError('🔒 Требуется HTTPS! Откройте сайт по защищённой ссылке.'); return; }
-  if (!gestureState.mpReady) { if(!initMediaPipe()) return; }  if (!gestureState.running) {
+  if (!window.isSecureContext && location.hostname !== 'localhost') { showGestureError('🔒 Требуется HTTPS!'); return; }
+  if (!gestureState.mpReady) { if(!initMediaPipe()) return; }
+  if (!gestureState.running) {
     $('ambCamBtn').classList.add('active'); $('gestureOverlay').classList.add('active'); $('gestureStatus').classList.add('active');
     startCamera();
   } else {
@@ -440,6 +439,7 @@ $('playerName').onkeypress = (e) => { if(e.key==='Enter') addPlayer($('playerNam
 
 $('closeCheatBtn').onclick = () => $('cheatOverlay').classList.remove('active');
 $('nextDealerBtn').onclick = () => changeDealer(false);
+
 function dealChips(sbIdx, bbIdx) { if (!document.body.classList.contains('ambient')) return; const table = $('ambientTable'); const cx = window.innerWidth / 2; const cy = window.innerHeight / 2; [sbIdx, bbIdx].forEach(idx => { const node = table.querySelector(`.player-node[data-i="${idx}"]`); if (!node) return; const nodeRect = node.getBoundingClientRect(); const targetX = nodeRect.left + nodeRect.width/2; const targetY = nodeRect.top + nodeRect.height/2; const chip = document.createElement('div'); chip.className = 'flying-chip'; chip.style.left = `${cx}px`; chip.style.top = `${cy}px`; table.appendChild(chip); const anim = chip.animate([ { transform: 'translate(-50%, -50%) scale(0.5)', opacity: 0 }, { transform: 'translate(-50%, -50%) scale(1)', opacity: 1, offset: 0.2 }, { transform: `translate(calc(-50% + ${targetX - cx}px), calc(-50% + ${targetY - cy}px)) scale(1)`, opacity: 1, offset: 0.7 }, { transform: `translate(calc(-50% + ${targetX - cx}px), calc(-50% + ${targetY - cy}px)) scale(0.5)`, opacity: 0 } ], { duration: 700, easing: 'ease-in-out' }); anim.onfinish = () => chip.remove(); }); }
 
 function renderAmbientTable() { 
@@ -472,7 +472,27 @@ function renderAmbientTable() {
   $('ambDealerBtn').style.display = 'flex'; $('ambCamBtn').style.display = 'flex'; $('ambCheatBtn').style.display = 'block'; $('ambResetBtn').style.display = 'block';
 }
 
-function updateUI() { const lvl = structure[levelIndex] || structure[structure.length-1]; $('levelNum').textContent = levelIndex + 1; $('sb').textContent = lvl.sb; $('bb').textContent = lvl.bb; $('timer').textContent = formatTime(timeLeft); $('ambLevel').textContent = levelIndex + 1; $('ambSb').textContent = lvl.sb; $('ambBb').textContent = lvl.bb; $('ambTimer').textContent = formatTime(timeLeft); const nextEl = $('nextLevel'); const ambNextEl = $('ambNextBlinds'); let nextHtml = ''; if (levelIndex + 1 < structure.length) { const next = structure[levelIndex+1]; nextHtml = `Далее: <span>${next.sb} / ${next.bb}</span>`; } else { nextHtml = '🏆 <span>Финал</span>'; } nextEl.innerHTML = nextHtml; ambNextEl.innerHTML = nextHtml; const timerEl = $('timer'), ambTimerEl = $('ambTimer'); const isWarn = timeLeft <= 60 && timeLeft > 10; const isDanger = timeLeft <= 10; timerEl.classList.toggle('warning', isWarn); timerEl.classList.toggle('danger', isDanger); ambTimerEl.classList.toggle('warning', isWarn); ambTimerEl.classList.toggle('danger', isDanger); if (isRunning) $('status').textContent = '⏱ Игра идет...'; else if (isPaused) $('status').textContent = '⏸ Пауза'; else $('status').textContent = players.length ? '🟢 Готов к старту' : '➕ Добавьте игроков'; }
+function updateUI() { 
+  const lvl = structure[levelIndex] || structure[structure.length-1]; 
+  $('levelIndexDisplay').textContent = levelIndex + 1; 
+  $('sb').textContent = lvl.sb; $('bb').textContent = lvl.bb; 
+  $('timer').textContent = formatTime(timeLeft); 
+  $('ambLevel').textContent = levelIndex + 1; 
+  $('ambSb').textContent = lvl.sb; $('ambBb').textContent = lvl.bb; 
+  $('ambTimer').textContent = formatTime(timeLeft); 
+  const nextEl = $('nextLevel'); const ambNextEl = $('ambNextBlinds'); 
+  let nextHtml = ''; 
+  if (levelIndex + 1 < structure.length) { const next = structure[levelIndex+1]; nextHtml = `Далее: <span>${next.sb} / ${next.bb}</span>`; } 
+  else { nextHtml = '🏆 <span>Финал</span>'; } 
+  nextEl.innerHTML = nextHtml; ambNextEl.innerHTML = nextHtml; 
+  const timerEl = $('timer'), ambTimerEl = $('ambTimer'); 
+  const isWarn = timeLeft <= 60 && timeLeft > 10; const isDanger = timeLeft <= 10; 
+  timerEl.classList.toggle('warning', isWarn); timerEl.classList.toggle('danger', isDanger); 
+  ambTimerEl.classList.toggle('warning', isWarn); ambTimerEl.classList.toggle('danger', isDanger); 
+  if (isRunning) $('status').textContent = '⏱ Игра идет...'; 
+  else if (isPaused) $('status').textContent = '⏸ Пауза'; 
+  else $('status').textContent = players.length ? '🟢 Готов к старту' : '➕ Добавьте игроков'; 
+}
 
 function advanceLevel(isAuto = false) { 
   levelIndex++; warn60 = false; warn30 = false; warn3 = false; 
@@ -480,6 +500,7 @@ function advanceLevel(isAuto = false) {
   if (levelIndex >= structure.length) { clearInterval(timerInterval); isRunning = false; releaseWakeLock(); $('status').textContent = '🏆 Турнир окончен!'; $('timer').classList.remove('warning','danger'); $('ambTimer').classList.remove('warning','danger'); playLevelUpSound(); updateUI(); return; } 
   timeLeft = parseInt($('duration').value) * 60; playLevelUpSound(); updateUI(); const pos = getPositions(); dealChips(pos.sb, pos.bb); if (!isAuto) { clearInterval(timerInterval); isRunning = false; isPaused = true; releaseWakeLock(); $('startBtn').disabled = false; $('pauseBtn').disabled = true; $('startBtn').textContent = 'Продолжить'; } 
 }
+
 function tick() { 
   if (timeLeft > 0) { 
     timeLeft--;
@@ -489,12 +510,32 @@ function tick() {
     updateUI(); 
   } else { advanceLevel(true); } 
 }
-$('startBtn').onclick = () => { initAudio(); if(isRunning) return; if(!isPaused) { levelIndex=0; timeLeft=parseInt($('duration').value)*60; warn60=false; warn30=false; warn3=false; generateStructure(); $('ambNextBlinds').classList.remove('urgent'); } isRunning=true; isPaused=false; updateUI(); requestWakeLock(); timerInterval=setInterval(tick, 1000); $('startBtn').disabled=true; $('pauseBtn').disabled=false; $('startBtn').textContent='Идет...'; };
-$('pauseBtn').onclick = () => { if(!isRunning) return; clearInterval(timerInterval); isRunning=false; isPaused=true; releaseWakeLock(); $('startBtn').disabled=false; $('pauseBtn').disabled=true; $('startBtn').textContent='Продолжить'; updateUI(); };
-$('resetBtn').onclick = () => { clearInterval(timerInterval); isRunning=false; isPaused=false; releaseWakeLock(); levelIndex=0; timeLeft=parseInt($('duration').value)*60; warn60=false; warn30=false; warn3=false; generateStructure(); $('ambNextBlinds').classList.remove('urgent'); $('startBtn').disabled=false; $('pauseBtn').disabled=true; $('startBtn').textContent='Старт'; updateUI(); };
+
+$('startBtn').onclick = () => { 
+  initAudio(); if(isRunning) return; 
+  if(!isPaused) { levelIndex=0; timeLeft=parseInt($('duration').value)*60; warn60=false; warn30=false; warn3=false; generateStructure(); $('ambNextBlinds').classList.remove('urgent'); } 
+  isRunning=true; isPaused=false; updateUI(); requestWakeLock(); 
+  timerInterval=setInterval(tick, 1000); 
+  $('startBtn').disabled=true; $('pauseBtn').disabled=false; $('startBtn').textContent='Идет...'; 
+};
+
+$('pauseBtn').onclick = () => { 
+  if(!isRunning) return; 
+  clearInterval(timerInterval); isRunning=false; isPaused=true; releaseWakeLock(); 
+  $('startBtn').disabled=false; $('pauseBtn').disabled=true; $('startBtn').textContent='Продолжить'; 
+  updateUI(); 
+};
+
+$('resetBtn').onclick = () => { 
+  clearInterval(timerInterval); isRunning=false; isPaused=false; releaseWakeLock(); 
+  levelIndex=0; timeLeft=parseInt($('duration').value)*60; warn60=false; warn30=false; warn3=false; generateStructure(); 
+  $('ambNextBlinds').classList.remove('urgent'); 
+  $('startBtn').disabled=false; $('pauseBtn').disabled=true; $('startBtn').textContent='Старт'; 
+  updateUI(); 
+};
+
 $('nextBtn').onclick = () => { initAudio(); advanceLevel(false); };
 
-// СБРОС ТАЙМЕРА В AMBIENT РЕЖИМЕ
 $('ambResetBtn').onclick = () => {
   clearInterval(timerInterval); isRunning=false; isPaused=false; releaseWakeLock();
   levelIndex=0; timeLeft=parseInt($('duration').value)*60; warn60=false; warn30=false; warn3=false; generateStructure();
@@ -507,8 +548,8 @@ $('ambientHint').onclick = () => { document.body.classList.remove('ambient'); re
 
 window.addEventListener('resize', () => { if(document.body.classList.contains('ambient')) renderAmbientTable(); });
 
-function saveSettings() { localStorage.setItem('pokerTimer_v17', JSON.stringify({ duration: $('duration').value, progression: $('progression').value, players: players, dealerIndex: dealerIndex })); }
-function loadSettings() { const s = localStorage.getItem('pokerTimer_v17'); if(s) { const d = JSON.parse(s); $('duration').value = d.duration || 10; $('progression').value = d.progression || 'custom'; if(d.players) { players = d.players; dealerIndex = d.dealerIndex || 0; } } }
+function saveSettings() { localStorage.setItem('pokerTimer_v18', JSON.stringify({ duration: $('duration').value, progression: $('progression').value, players: players, dealerIndex: dealerIndex })); }
+function loadSettings() { const s = localStorage.getItem('pokerTimer_v18'); if(s) { const d = JSON.parse(s); $('duration').value = d.duration || 10; $('progression').value = d.progression || 'custom'; if(d.players) { players = d.players; dealerIndex = d.dealerIndex || 0; } } }
 ['duration','progression'].forEach(id => $(id).addEventListener('change', () => { saveSettings(); generateStructure(); updateUI(); }));
 
 loadSettings(); loadGestureSettings(); generateStructure(); renderPlayers(); updateUI();
