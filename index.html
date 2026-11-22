@@ -3,9 +3,13 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>Покерный таймер + Жесты</title>
+<title>Покерный таймер + Синхронизация</title>
 <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js" crossorigin="anonymous"></script>
 <script src="https://cdn.jsdelivr.net/npm/@mediapipe/hands/hands.js" crossorigin="anonymous"></script>
+<!-- Firebase SDK (Compat version for easier use in single file) -->
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+
 <style>
   :root { --bg: #121c12; --panel: #1e331e; --accent: #4caf50; --text: #e8f5e9; --warn: #ff9800; --danger: #f44336; --dealer: #2196f3; --out: #555; }
   * { box-sizing: border-box; margin: 0; padding: 0; font-family: system-ui, -apple-system, sans-serif; -webkit-tap-highlight-color: transparent; }
@@ -252,6 +256,26 @@
 <video id="camVideo" autoplay playsinline muted style="display:none; position:fixed; top:10px; right:10px; width:100px; border-radius:8px; opacity:0.6; z-index:99; border:2px solid #333;"></video>
 
 <script>
+// === FIREBASE CONFIGURATION ===
+const firebaseConfig = {
+  apiKey: "AIzaSyDzH6qScJS7tkKQr5ayR1VpD0armVmX9BI",
+  authDomain: "timer-1d700.firebaseapp.com",
+  databaseURL: "https://timer-1d700-default-rtdb.europe-west1.firebasedatabase.app",
+  projectId: "timer-1d700",
+  storageBucket: "timer-1d700.firebasestorage.app",
+  messagingSenderId: "58146644512",
+  appId: "1:58146644512:web:820e4a7ac3a671c0859245"
+};
+
+// Инициализация Firebase
+let db = null;
+try {
+  firebase.initializeApp(firebaseConfig);
+  db = firebase.database();
+  console.log("Firebase initialized successfully");
+} catch(e) { console.error("Firebase init error:", e); }
+
+// === STATE ===
 let levelIndex = 0, timeLeft = 10 * 60, timerInterval = null;
 let isRunning = false, isPaused = false, audioCtx = null, wakeLock = null;
 let warn60 = false, warn30 = false, warn3 = false;
@@ -298,6 +322,7 @@ function changeDealer(silent = false) {
   dealerIndex = active[nextPos];
   renderPlayers(); renderAmbientTable();
   if (!silent) { playDealerSound(); requestAnimationFrame(() => { const pos = getPositions(); dealChips(pos.sb, pos.bb); }); }
+  syncState(); // Синхронизация при смене дилера
 }
 
 let hands = null, videoLoopId = null;
@@ -424,16 +449,16 @@ function formatTime(sec) { const m = Math.floor(sec/60).toString().padStart(2,'0
 function togglePlayerStatus(index) {
   const wasActive = players[index].active; const posBefore = getPositions(); players[index].active = !players[index].active;
   if (wasActive && !players[index].active && (index === posBefore.dealer || index === posBefore.sb || index === posBefore.bb)) changeDealer(true);
-  renderPlayers(); renderAmbientTable(); saveSettings();
+  renderPlayers(); renderAmbientTable(); saveSettings(); syncState();
 }
-function initiateDelete(index) { if (deleteConfirmId === index) { players.splice(index, 1); if (players.length === 0) dealerIndex = 0; else if (dealerIndex >= players.length) dealerIndex = 0; deleteConfirmId = null; renderPlayers(); saveSettings(); } else { deleteConfirmId = index; renderPlayers(); } }
+function initiateDelete(index) { if (deleteConfirmId === index) { players.splice(index, 1); if (players.length === 0) dealerIndex = 0; else if (dealerIndex >= players.length) dealerIndex = 0; deleteConfirmId = null; renderPlayers(); saveSettings(); syncState(); } else { deleteConfirmId = index; renderPlayers(); } }
 function cancelDelete() { deleteConfirmId = null; renderPlayers(); }
-function reviveAll() { players.forEach(p => p.active = true); renderPlayers(); saveSettings(); }
+function reviveAll() { players.forEach(p => p.active = true); renderPlayers(); saveSettings(); syncState(); }
 $('reviveAllBtn').onclick = reviveAll;
 
 function renderPlayers() { const list = $('playersList'); const pos = getPositions(); const activeCount = getActiveIndices().length; $('playerCount').textContent = `${activeCount} / ${players.length}`; list.innerHTML = ''; if (players.length === 0) { list.innerHTML = '<div style="opacity:0.5; text-align:center; padding:15px; width:100%;">Нет игроков</div>'; return; } players.forEach((p, i) => { const item = document.createElement('div'); item.className = 'player-item'; if (!p.active) item.classList.add('out'); if (i === pos.dealer && p.active) item.classList.add('dealer'); if (i === pos.sb && p.active) item.classList.add('sb'); if (i === pos.bb && p.active) item.classList.add('bb'); let badges = ''; if (i === pos.dealer && p.active) badges += '<span class="player-badge badge-dealer">D</span>'; if (i === pos.sb && p.active) badges += '<span class="player-badge badge-sb">SB</span>'; if (i === pos.bb && p.active) badges += '<span class="player-badge badge-bb">BB</span>'; if (!p.active) badges += '<span class="player-badge" style="background:#555; color:#aaa;">OUT</span>'; const statusBtn = document.createElement('button'); statusBtn.className = `btn-status ${p.active ? 'active' : 'out'}`; statusBtn.textContent = p.active ? '😎' : '😴'; statusBtn.onclick = (e) => { e.stopPropagation(); togglePlayerStatus(i); }; item.innerHTML = `<div class="player-name">${p.name || `P${i+1}`}</div>${badges}`; item.prepend(statusBtn); if (players.length > 1) { const btn = document.createElement('button'); btn.className = 'btn-remove'; if (deleteConfirmId === i) { btn.classList.add('confirm-mode'); btn.textContent = '?'; } else { btn.textContent = '✕'; } btn.onclick = (e) => { e.stopPropagation(); initiateDelete(i); }; item.appendChild(btn); } item.onclick = () => { if(deleteConfirmId !== null) cancelDelete(); }; list.appendChild(item); }); }
 
-function addPlayer(name) { const trimmed = (name || '').trim(); if (!trimmed) return; players.push({ name: trimmed, id: Date.now(), active: true }); if (players.length === 1) dealerIndex = 0; deleteConfirmId = null; renderPlayers(); saveSettings(); $('playerName').value = ''; $('playerName').focus(); }
+function addPlayer(name) { const trimmed = (name || '').trim(); if (!trimmed) return; players.push({ name: trimmed, id: Date.now(), active: true }); if (players.length === 1) dealerIndex = 0; deleteConfirmId = null; renderPlayers(); saveSettings(); syncState(); $('playerName').value = ''; $('playerName').focus(); }
 $('addPlayerBtn').onclick = () => addPlayer($('playerName').value);
 $('playerName').onkeypress = (e) => { if(e.key==='Enter') addPlayer($('playerName').value); };
 
@@ -497,8 +522,9 @@ function updateUI() {
 function advanceLevel(isAuto = false) { 
   levelIndex++; warn60 = false; warn30 = false; warn3 = false; 
   $('ambNextBlinds').classList.remove('urgent');
-  if (levelIndex >= structure.length) { clearInterval(timerInterval); isRunning = false; releaseWakeLock(); $('status').textContent = '🏆 Турнир окончен!'; $('timer').classList.remove('warning','danger'); $('ambTimer').classList.remove('warning','danger'); playLevelUpSound(); updateUI(); return; } 
+  if (levelIndex >= structure.length) { clearInterval(timerInterval); isRunning = false; releaseWakeLock(); $('status').textContent = '🏆 Турнир окончен!'; $('timer').classList.remove('warning','danger'); $('ambTimer').classList.remove('warning','danger'); playLevelUpSound(); updateUI(); syncState(); return; } 
   timeLeft = parseInt($('duration').value) * 60; playLevelUpSound(); updateUI(); const pos = getPositions(); dealChips(pos.sb, pos.bb); if (!isAuto) { clearInterval(timerInterval); isRunning = false; isPaused = true; releaseWakeLock(); $('startBtn').disabled = false; $('pauseBtn').disabled = true; $('startBtn').textContent = 'Продолжить'; } 
+  syncState();
 }
 
 function tick() { 
@@ -511,19 +537,70 @@ function tick() {
   } else { advanceLevel(true); } 
 }
 
+// === SYNC FUNCTIONS ===
+function syncState() {
+  if (!db) return;
+  const state = {
+    levelIndex,
+    timeLeft,
+    isRunning,
+    isPaused,
+    dealerIndex,
+    players,
+    timestamp: Date.now()
+  };
+  db.ref('pokerGame').set(state);
+}
+
+function listenForUpdates() {
+  if (!db) return;
+  db.ref('pokerGame').on('value', (snapshot) => {
+    const data = snapshot.val();
+    if (!data) return;
+    
+    // Обновляем состояние только если оно отличается от текущего
+    if (data.levelIndex !== levelIndex || data.timeLeft !== timeLeft || data.isRunning !== isRunning) {
+      levelIndex = data.levelIndex;
+      timeLeft = data.timeLeft;
+      isRunning = data.isRunning;
+      isPaused = data.isPaused;
+      dealerIndex = data.dealerIndex;
+      players = data.players || [];
+      
+      // Сбрасываем предупреждения при синхронизации
+      warn60 = false; warn30 = false; warn3 = false;
+      
+      renderPlayers();
+      renderAmbientTable();
+      updateUI();
+      
+      // Если таймер запущен на другом устройстве, запускаем локально
+      if (isRunning && !timerInterval) {
+        timerInterval = setInterval(tick, 1000);
+        $('startBtn').disabled = true; $('pauseBtn').disabled = false; $('startBtn').textContent = 'Идет...';
+      } else if (!isRunning && timerInterval) {
+        clearInterval(timerInterval); timerInterval = null;
+        $('startBtn').disabled = false; $('pauseBtn').disabled = true;
+        $('startBtn').textContent = isPaused ? 'Продолжить' : 'Старт';
+      }
+    }
+  });
+}
+
 $('startBtn').onclick = () => { 
   initAudio(); if(isRunning) return; 
   if(!isPaused) { levelIndex=0; timeLeft=parseInt($('duration').value)*60; warn60=false; warn30=false; warn3=false; generateStructure(); $('ambNextBlinds').classList.remove('urgent'); } 
   isRunning=true; isPaused=false; updateUI(); requestWakeLock(); 
   timerInterval=setInterval(tick, 1000); 
   $('startBtn').disabled=true; $('pauseBtn').disabled=false; $('startBtn').textContent='Идет...'; 
+  syncState();
 };
 
 $('pauseBtn').onclick = () => { 
   if(!isRunning) return; 
   clearInterval(timerInterval); isRunning=false; isPaused=true; releaseWakeLock(); 
   $('startBtn').disabled=false; $('pauseBtn').disabled=true; $('startBtn').textContent='Продолжить'; 
-  updateUI(); 
+  updateUI(); syncState();
 };
 
 $('resetBtn').onclick = () => { 
@@ -531,7 +608,7 @@ $('resetBtn').onclick = () => {
   levelIndex=0; timeLeft=parseInt($('duration').value)*60; warn60=false; warn30=false; warn3=false; generateStructure(); 
   $('ambNextBlinds').classList.remove('urgent'); 
   $('startBtn').disabled=false; $('pauseBtn').disabled=true; $('startBtn').textContent='Старт'; 
-  updateUI(); 
+  updateUI(); syncState();
 };
 
 $('nextBtn').onclick = () => { initAudio(); advanceLevel(false); };
@@ -540,7 +617,7 @@ $('ambResetBtn').onclick = () => {
   clearInterval(timerInterval); isRunning=false; isPaused=false; releaseWakeLock();
   levelIndex=0; timeLeft=parseInt($('duration').value)*60; warn60=false; warn30=false; warn3=false; generateStructure();
   $('ambNextBlinds').classList.remove('urgent');
-  updateUI();
+  updateUI(); syncState();
 };
 
 $('ambientBtn').onclick = () => { document.body.classList.toggle('ambient'); if(document.body.classList.contains('ambient')) { requestWakeLock(); renderAmbientTable(); } else { releaseWakeLock(); $('cheatOverlay').classList.remove('active'); if(gestureState.running) stopCamera(); $('ambCamBtn').classList.remove('active'); $('gestureOverlay').classList.remove('active'); $('gestureStatus').classList.remove('active'); $('ambDealerBtn').style.display = 'none'; $('ambCamBtn').style.display = 'none'; $('ambCheatBtn').style.display = 'none'; $('ambResetBtn').style.display = 'none'; } };
@@ -548,11 +625,12 @@ $('ambientHint').onclick = () => { document.body.classList.remove('ambient'); re
 
 window.addEventListener('resize', () => { if(document.body.classList.contains('ambient')) renderAmbientTable(); });
 
-function saveSettings() { localStorage.setItem('pokerTimer_v18', JSON.stringify({ duration: $('duration').value, progression: $('progression').value, players: players, dealerIndex: dealerIndex })); }
-function loadSettings() { const s = localStorage.getItem('pokerTimer_v18'); if(s) { const d = JSON.parse(s); $('duration').value = d.duration || 10; $('progression').value = d.progression || 'custom'; if(d.players) { players = d.players; dealerIndex = d.dealerIndex || 0; } } }
-['duration','progression'].forEach(id => $(id).addEventListener('change', () => { saveSettings(); generateStructure(); updateUI(); }));
+function saveSettings() { localStorage.setItem('pokerTimer_v17', JSON.stringify({ duration: $('duration').value, progression: $('progression').value, players: players, dealerIndex: dealerIndex })); }
+function loadSettings() { const s = localStorage.getItem('pokerTimer_v17'); if(s) { const d = JSON.parse(s); $('duration').value = d.duration || 10; $('progression').value = d.progression || 'custom'; if(d.players) { players = d.players; dealerIndex = d.dealerIndex || 0; } } }
+['duration','progression'].forEach(id => $(id).addEventListener('change', () => { saveSettings(); generateStructure(); updateUI(); syncState(); }));
 
 loadSettings(); loadGestureSettings(); generateStructure(); renderPlayers(); updateUI();
+if (db) listenForUpdates(); // Запуск прослушивания изменений
 </script>
 </body>
 </html>
